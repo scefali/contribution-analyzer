@@ -20,8 +20,8 @@ import {
 	useSubmit,
 } from '@remix-run/react'
 import { withSentry } from '@sentry/remix'
-import { ThemeSwitch, useTheme } from './routes/resources+/theme/index.tsx'
-import { getTheme } from './routes/resources+/theme/theme-session.server.ts'
+import { ThemeSwitch, useTheme } from './components/theme/index.tsx'
+import { getTheme } from './components/theme/theme-session.server.ts'
 import fontStylestylesheetUrl from './styles/font.css'
 import tailwindStylesheetUrl from './styles/tailwind.css'
 import { authenticator, getUserId } from './utils/auth.server.ts'
