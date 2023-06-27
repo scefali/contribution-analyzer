@@ -126,7 +126,6 @@ export const headers: HeadersFunction = ({ loaderHeaders }) => {
 function App() {
 	const data = useLoaderData<typeof loader>()
 	const nonce = useNonce()
-	const user = useOptionalUser()
 	const theme = useTheme()
 
 	return (
@@ -139,34 +138,8 @@ function App() {
 				<Links />
 			</head>
 			<body className="flex h-full flex-col justify-between bg-background text-foreground">
-				<header className="container mx-auto py-6">
-					<nav className="flex justify-between">
-						<Link to="/">
-							<div className="font-light">epic</div>
-							<div className="font-bold">notes</div>
-						</Link>
-						<div className="flex items-center gap-10">
-							{user ? (
-								<UserDropdown />
-							) : (
-								<ButtonLink to="/login" size="sm" variant="primary">
-									Log In
-								</ButtonLink>
-							)}
-						</div>
-					</nav>
-				</header>
-
 				<div className="flex-1">
 					<Outlet />
-				</div>
-
-				<div className="container mx-auto flex justify-between">
-					<Link to="/">
-						<div className="font-light">epic</div>
-						<div className="font-bold">notes</div>
-					</Link>
-					<ThemeSwitch userPreference={data.requestInfo.session.theme} />
 				</div>
 				<div className="h-5" />
 				<ScrollRestoration nonce={nonce} />
@@ -183,75 +156,3 @@ function App() {
 	)
 }
 export default withSentry(App)
-
-function UserDropdown() {
-	const user = useUser()
-	const submit = useSubmit()
-	const formRef = useRef<HTMLFormElement>(null)
-	return (
-		<DropdownMenu.Root>
-			<DropdownMenu.Trigger asChild>
-				<Link
-					to={`/users/${user.username}`}
-					// this is for progressive enhancement
-					onClick={e => e.preventDefault()}
-					className="bg-brand-500 hover:bg-brand-400 focus:bg-brand-400 radix-state-open:bg-brand-400 flex items-center gap-2 rounded-full py-2 pl-2 pr-4 outline-none"
-				>
-					<img
-						className="h-8 w-8 rounded-full object-cover"
-						alt={user.name ?? user.username}
-						src={getUserImgSrc(user.imageId)}
-					/>
-					<span className="text-body-sm font-bold text-white">
-						{user.name ?? user.username}
-					</span>
-				</Link>
-			</DropdownMenu.Trigger>
-			<DropdownMenu.Portal>
-				<DropdownMenu.Content
-					sideOffset={8}
-					align="start"
-					className="flex flex-col rounded-3xl bg-[#323232]"
-				>
-					<DropdownMenu.Item asChild>
-						<Link
-							prefetch="intent"
-							to={`/users/${user.username}`}
-							className="hover:bg-brand-500 radix-highlighted:bg-brand-500 rounded-t-3xl px-7 py-5 outline-none"
-						>
-							Profile
-						</Link>
-					</DropdownMenu.Item>
-					<DropdownMenu.Item asChild>
-						<Link
-							prefetch="intent"
-							to={`/users/${user.username}/notes`}
-							className="hover:bg-brand-500 radix-highlighted:bg-brand-500 px-7 py-5 outline-none"
-						>
-							Notes
-						</Link>
-					</DropdownMenu.Item>
-					<DropdownMenu.Item
-						asChild
-						// this prevents the menu from closing before the form submission is completed
-						onSelect={event => {
-							event.preventDefault()
-							submit(formRef.current)
-						}}
-					>
-						<Form
-							action="/logout"
-							method="POST"
-							className="radix-highlighted:bg-brand-500 rounded-b-3xl outline-none"
-							ref={formRef}
-						>
-							<button type="submit" className="px-7 py-5">
-								Logout
-							</button>
-						</Form>
-					</DropdownMenu.Item>
-				</DropdownMenu.Content>
-			</DropdownMenu.Portal>
-		</DropdownMenu.Root>
-	)
-}
