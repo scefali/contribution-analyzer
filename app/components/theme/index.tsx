@@ -5,7 +5,6 @@ import { useFetcher } from '@remix-run/react'
 import * as React from 'react'
 import { z } from 'zod'
 import { useHints } from '~/utils/client-hints.tsx'
-import { ErrorList } from '~/utils/forms.tsx'
 import { safeRedirect } from '~/utils/misc.ts'
 import { useRequestInfo } from '~/utils/request-info.ts'
 import {
@@ -115,7 +114,6 @@ export function ThemeSwitch({
 					{modeLabel[mode]}
 				</button>
 			</div>
-			<ErrorList errors={form.errors} id={form.errorId} />
 		</fetcher.Form>
 	)
 }

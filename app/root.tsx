@@ -28,7 +28,6 @@ import { authenticator, getUserId } from './utils/auth.server.ts'
 import { ClientHintCheck, getHints } from './utils/client-hints.tsx'
 import { prisma } from './utils/db.server.ts'
 import { getEnv } from './utils/env.server.ts'
-import { ButtonLink } from './utils/forms.tsx'
 import { getDomainUrl } from './utils/misc.server.ts'
 import { getUserImgSrc } from './utils/misc.ts'
 import { useNonce } from './utils/nonce-provider.ts'
@@ -129,7 +128,7 @@ function App() {
 	const theme = useTheme()
 
 	return (
-		<html lang="en" className={`${theme} h-full`}>
+		<html lang="en" className={`${theme} h-full`} suppressHydrationWarning={true}>
 			<head>
 				<ClientHintCheck nonce={nonce} />
 				<Meta />

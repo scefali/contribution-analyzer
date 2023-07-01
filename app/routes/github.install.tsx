@@ -1,15 +1,16 @@
 import React, { useState } from 'react'
 import { App } from 'octokit'
 import { json, type DataFunctionArgs } from '@remix-run/node'
+import { Link } from '@remix-run/react'
 
+import Github from '~/images/github.tsx'
 
-import { ButtonLink } from '~/utils/forms.tsx'
 import { useLoaderData } from '@remix-run/react'
 
 export function loader() {
 	const redirectUri = 'https://scefali.ngrok.io/github/oauth/callback'
 	const githubUrl = new URL('https://github.com/login/oauth/authorize')
- 	// TODO: use oktokit to generate this url
+	// TODO: use oktokit to generate this url
 	githubUrl.searchParams.set('client_id', process.env.GITHUB_CLIENT_ID || '')
 	githubUrl.searchParams.set('redirect_uri', redirectUri)
 	githubUrl.searchParams.set('scope', 'repo,issues')
@@ -21,11 +22,16 @@ export function loader() {
 function GithubAppInstallationPage() {
 	const { githubUrl } = useLoaderData()
 	return (
-		<div>
-			<h1>Github Application Installation</h1>
-			<ButtonLink size="md" variant="primary" to={githubUrl}>
-				Install GitHub Application
-			</ButtonLink>
+		<div className="flex pt-14">
+			<div className="m-auto max-w-screen-sm">
+				<div className="rounded-sm p-36 shadow-sm bg-secondary border-solid">
+					<h1 className="text-xl">Connect your Github Account</h1>
+					<Link to={githubUrl} className="flex mt-4">
+						<Github className="my-auto mr-1" />
+						Install
+					</Link>
+				</div>
+			</div>
 		</div>
 	)
 }
