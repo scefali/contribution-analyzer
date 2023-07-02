@@ -22,7 +22,7 @@ export const generateSummaryForPrs = async ({
 		}
 		// if joined text buffer is > 1000 characters, then summarize
 		// and clear the buffer
-		const possiblePrompt = `Summarize this users Github activity for ${name} who is an employee of Getsentry: ${textBuffer.join(
+		const possiblePrompt = `Summarize this users Github activity for ${name} who is an employee of Sentry. Please be sure to list all the major projects and featuers this peron worked on: ${textBuffer.join(
 			'',
 		)}`
 		if (possiblePrompt.length > 3000) {

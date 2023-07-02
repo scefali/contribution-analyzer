@@ -3,6 +3,7 @@ import { Octokit } from 'octokit'
 import type { Endpoints } from '@octokit/types'
 
 import { generateSummaryForPrs } from './ai.ts'
+import { r } from 'node_modules/msw/lib/glossary-de6278a9.js'
 
 type SearchIssuesResponseType = Endpoints['GET /search/issues']['response']
 export type PullRequest = SearchIssuesResponseType['data']['items'][0]
@@ -22,9 +23,11 @@ export const getClient = (authToken: string) => {
 export const generateSummary = async ({
 	userName,
 	githubCookie,
+	name,
 }: {
 	userName: string
 	githubCookie: string
+	name: string
 }) => {
 	const query = `is:pull-request+is:merged+author:${userName}`
 	// TODO: use Github client to fetch PRs
@@ -47,5 +50,16 @@ export const generateSummary = async ({
 	// )]
 	const output = (await response.json()) as SearchIssuesResponseType['data']
 	console.log({ output })
-	return generateSummaryForPrs({ prs: output.items, name: userName })
+	return generateSummaryForPrs({ prs: output.items, name })
+}
+
+export const getUser = async ({
+	userName,
+	githubCookie,
+}: {
+	userName: string
+	githubCookie: string
+}) => {
+	const client = getClient(githubCookie)
+	return client.rest.users.getByUsername({ username: userName })
 }

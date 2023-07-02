@@ -25,7 +25,10 @@ function GithubAppInstallationPage() {
 		<div className="flex pt-14">
 			<div className="m-auto max-w-screen-sm">
 				<div className="rounded-sm p-36 shadow-sm bg-secondary border-solid">
-					<h1 className="text-xl">Connect your Github Account</h1>
+					<h1 className="text-xl font-bold">Connect your Github Account</h1>
+					<p className="text-sm text-muted-foreground mt-2">
+						Connect your Github to get started with the Contribution Analyzer
+					</p>
 					<Link to={githubUrl} className="flex mt-4">
 						<Github className="my-auto mr-1" />
 						Install
