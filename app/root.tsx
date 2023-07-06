@@ -1,4 +1,3 @@
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { cssBundleHref } from '@remix-run/css-bundle'
 import {
 	json,
@@ -8,8 +7,6 @@ import {
 	type V2_MetaFunction,
 } from '@remix-run/node'
 import {
-	Form,
-	Link,
 	Links,
 	LiveReload,
 	Meta,
@@ -17,23 +14,17 @@ import {
 	Scripts,
 	ScrollRestoration,
 	useLoaderData,
-	useSubmit,
 } from '@remix-run/react'
 import { withSentry } from '@sentry/remix'
-import { ThemeSwitch, useTheme } from './components/theme/index.tsx'
+import { useTheme } from './components/theme/index.tsx'
 import { getTheme } from './components/theme/theme-session.server.ts'
 import fontStylestylesheetUrl from './styles/font.css'
 import tailwindStylesheetUrl from './styles/tailwind.css'
-import { authenticator, getUserId } from './utils/auth.server.ts'
 import { ClientHintCheck, getHints } from './utils/client-hints.tsx'
-import { prisma } from './utils/db.server.ts'
 import { getEnv } from './utils/env.server.ts'
 import { getDomainUrl } from './utils/misc.server.ts'
-import { getUserImgSrc } from './utils/misc.ts'
 import { useNonce } from './utils/nonce-provider.ts'
-import { makeTimings, time } from './utils/timing.server.ts'
-import { useOptionalUser, useUser } from './utils/user.ts'
-import { useRef } from 'react'
+import { makeTimings} from './utils/timing.server.ts'
 
 export const links: LinksFunction = () => {
 	return [
@@ -64,39 +55,19 @@ export const links: LinksFunction = () => {
 
 export const meta: V2_MetaFunction = () => {
 	return [
-		{ title: 'Epic Notes' },
-		{ name: 'description', content: 'Find yourself in outer space' },
+		{ title: 'Github Contribution Analyzer' },
+		{
+			name: 'description',
+			content:
+				'See your GitHub contributions as well as the contributions of your teammates.',
+		},
 	]
 }
 
 export async function loader({ request }: DataFunctionArgs) {
 	const timings = makeTimings('root loader')
-	const userId = await time(() => getUserId(request), {
-		timings,
-		type: 'getUserId',
-		desc: 'getUserId in root',
-	})
-
-	const user = userId
-		? await time(
-				() =>
-					prisma.user.findUnique({
-						where: { id: userId },
-						select: { id: true, name: true, username: true, imageId: true },
-					}),
-				{ timings, type: 'find user', desc: 'find user in root' },
-		  )
-		: null
-	if (userId && !user) {
-		console.info('something weird happened')
-		// something weird happened... The user is authenticated but we can't find
-		// them in the database. Maybe they were deleted? Let's log them out.
-		await authenticator.logout(request, { redirectTo: '/' })
-	}
-
 	return json(
 		{
-			user,
 			requestInfo: {
 				hints: getHints(request),
 				origin: getDomainUrl(request),
@@ -128,7 +99,11 @@ function App() {
 	const theme = useTheme()
 
 	return (
-		<html lang="en" className={`${theme} h-full`} suppressHydrationWarning={true}>
+		<html
+			lang="en"
+			className={`${theme} h-full`}
+			suppressHydrationWarning={true}
+		>
 			<head>
 				<ClientHintCheck nonce={nonce} />
 				<Meta />

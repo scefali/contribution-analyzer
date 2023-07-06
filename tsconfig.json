@@ -8,7 +8,6 @@
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "resolveJsonModule": true,
-    "target": "ES2022",
     "strict": true,
     "noImplicitAny": true,
     "allowJs": true,

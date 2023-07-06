@@ -49,7 +49,6 @@ export const generateSummary = async ({
 	// 	},
 	// )]
 	const output = (await response.json()) as SearchIssuesResponseType['data']
-	console.log({ output })
 	return generateSummaryForPrs({ prs: output.items, name })
 }
 

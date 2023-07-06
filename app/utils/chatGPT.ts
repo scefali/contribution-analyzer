@@ -2,11 +2,10 @@
 import { CreateCompletionResponse, Configuration, OpenAIApi } from 'openai'
 import { IncomingMessage } from 'http'
 
-
 const configuration = new Configuration({
- apiKey: process.env.OPENAI_API_KEY,
-});
-const OpenAI = new OpenAIApi(configuration);
+	apiKey: process.env.OPENAI_API_KEY,
+})
+const OpenAI = new OpenAIApi(configuration)
 
 async function* chunksToLines(
 	chunksAsync: IncomingMessage,
@@ -49,9 +48,7 @@ async function* streamCompletion(
 	yield* linesToMessages(chunksToLines(data))
 }
 
-export const createSimpleCompletion = async (prompt: string): Promise<string> => {
-	let completeText = ''
-
+export async function* createSimpleCompletion(prompt: string) {
 	const completion = await OpenAI.createCompletion(
 		{
 			model: 'text-davinci-003',
@@ -73,11 +70,10 @@ export const createSimpleCompletion = async (prompt: string): Promise<string> =>
 			const parsed = JSON.parse(message) as CreateCompletionResponse
 
 			const { text } = parsed.choices[0]
-
-			completeText += text
+			if (typeof text === 'string') {
+				yield text
+			}
 		} catch (error) {
 			console.error('Could not JSON parse stream message', message, error)
 		}
-
-	return completeText.trim()
 }
