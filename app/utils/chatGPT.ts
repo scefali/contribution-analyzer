@@ -71,7 +71,6 @@ export async function* createSimpleCompletion(prompt: string) {
 
 			const { text } = parsed.choices[0]
 			if (typeof text === 'string') {
-				console.log({ text })
 				yield text
 			}
 		} catch (error) {
