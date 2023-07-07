@@ -1,6 +1,6 @@
 /// `ChatGPT.tsx` from https://github.com/openai/openai-node/issues/18
-import { CreateCompletionResponse, Configuration, OpenAIApi } from 'openai'
-import { IncomingMessage } from 'http'
+import { type CreateCompletionResponse, Configuration, OpenAIApi } from 'openai'
+import { type IncomingMessage } from 'http'
 
 const configuration = new Configuration({
 	apiKey: process.env.OPENAI_API_KEY,
@@ -71,6 +71,7 @@ export async function* createSimpleCompletion(prompt: string) {
 
 			const { text } = parsed.choices[0]
 			if (typeof text === 'string') {
+				console.log({ text })
 				yield text
 			}
 		} catch (error) {

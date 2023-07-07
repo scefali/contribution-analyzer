@@ -28,12 +28,17 @@ export async function loader({ request, params }: DataFunctionArgs) {
 			name: name2Use,
 			githubCookie,
 		}).then(async generator => {
+			let count = 0
 			while (true) {
 				const newItem = await generator.next()
 				if (newItem.done) {
 					return
 				}
-				send({ event: 'data', data: newItem.value })
+				send({
+					event: 'githubData',
+					data: JSON.stringify({ value: newItem.value, index: count }),
+				})
+				count += 1
 			}
 		})
 		// eslint-disable-next-line @typescript-eslint/no-empty-function
