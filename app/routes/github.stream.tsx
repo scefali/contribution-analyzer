@@ -5,7 +5,7 @@ import { generateSummary, getUser } from '~/utils/github.ts'
 import { getSession } from '~/utils/session.server.ts'
 import { TimePeriod } from '~/utils/github.ts'
 
-const BUFFER_SIZE = 10
+const BUFFER_SIZE = 1
 
 function streamResponse(
 	request: DataFunctionArgs['request'],

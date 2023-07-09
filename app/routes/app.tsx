@@ -15,7 +15,6 @@ import {
 	useLoaderData,
 	useSearchParams,
 } from '@remix-run/react'
-import { useEventSource } from 'remix-utils'
 
 import { generateSummary, getUser } from '~/utils/github.ts'
 import { getSession } from '~/utils/session.server.ts'
@@ -29,6 +28,7 @@ import {
 	SelectValue,
 } from '~/@/components/ui/select.tsx'
 import { destroySession } from '~/utils/session.server.ts'
+import { useBufferedEventSource } from '~/utils/use-buffered-event-source.ts'
 
 type ActionData =
 	| { status: 'error'; message: string }
@@ -88,7 +88,8 @@ export default function App() {
 	const queryParamsToUse = userName
 		? queryParams
 		: new URLSearchParams({ ignore: '1' })
-	const rawStream = useEventSource(
+
+	const rawStreamArray = useBufferedEventSource(
 		`/github/stream?${queryParamsToUse.toString()}`,
 		{
 			event: 'githubData',
@@ -97,22 +98,38 @@ export default function App() {
 
 	const [text, setText] = useState('')
 	useEffect(() => {
-		const stream = rawStream ? (JSON.parse(rawStream) as StreamData) : null
-		if (stream?.action === 'data') {
-			const streamText =
-				stream?.value !== 'UNKNOWN_EVENT_DATA' ? stream?.value || '' : ''
-			setText((prevText: string) => prevText + streamText)
-		}
-	}, [rawStream])
+		const dataStreams = rawStreamArray.filter(rawStream => {
+			const stream = rawStream ? (JSON.parse(rawStream) as StreamData) : null
+			return stream?.action === 'data'
+		})
+		const dataStreamsText = dataStreams.map(rawStream => {
+			const stream = rawStream
+				? (JSON.parse(rawStream) as {
+						action: 'data'
+						value: string
+				  })
+				: null
+			if (!stream) return ''
+			return stream.value
+		})
+		setText((prevText: string) => prevText + dataStreamsText.join(''))
+	}, [rawStreamArray])
 
 	const [error, setError] = useState<string | null>(null)
 	useEffect(() => {
-		const stream = rawStream ? (JSON.parse(rawStream) as StreamData) : null
+		const errorStream = rawStreamArray.find(rawStream => {
+			const stream = rawStream ? (JSON.parse(rawStream) as StreamData) : null
+			return stream?.action === 'error'
+		})
 		// if stream has error set error state
-		if (stream?.action === 'error') {
+		if (errorStream) {
+			const stream = JSON.parse(errorStream) as {
+				action: 'error'
+				message: string
+			}
 			setError(stream.message)
 		}
-	}, [rawStream])
+	}, [rawStreamArray])
 
 	// clear the text when the user presses submitƒ
 	useEffect(() => {
