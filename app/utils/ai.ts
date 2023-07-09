@@ -22,7 +22,7 @@ export async function* generateSummaryForPrs({
 		// if joined text buffer is > 1000 characters, then summarize
 		// and clear the buffer
 		const possiblePrompt = `
-		List the projects and features ${name} worked on.
+		List the projects and features ${name} worked on. Give me human readable sentences.
 		Do it in the form of a list. ${textBuffer.join('')}`
 		if (possiblePrompt.length > 3000 || prs.length === 0) {
 			textBuffer = []

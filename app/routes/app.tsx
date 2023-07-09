@@ -2,6 +2,7 @@ import {
 	type DataFunctionArgs,
 	type TypedResponse,
 	json,
+	redirect,
 } from '@remix-run/node'
 import { Loader2 } from 'lucide-react'
 import { Suspense, useEffect, useState } from 'react'
@@ -27,10 +28,21 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '~/@/components/ui/select.tsx'
+import { destroySession } from '~/utils/session.server.ts'
 
 type ActionData =
 	| { status: 'error'; message: string }
 	| { userName: string; status: 'success' }
+
+type StreamData =
+	| {
+			action: 'error'
+			message: string
+	  }
+	| {
+			action: 'data'
+			value: string
+	  }
 
 export async function action({
 	request,
@@ -47,24 +59,62 @@ export async function action({
 	return json({ status: 'success', userName })
 }
 
+export async function loader({ request }: DataFunctionArgs) {
+	const session = await getSession(request.headers.get('Cookie'))
+	const githubCookie = session.get('github-auth')
+
+	// check if our token is still valid when the page laods
+	try {
+		await getUser({ userName: 'scefali', githubCookie })
+	} catch (e) {
+		// TODO: better error handling
+		// if not, redirect to the the install page after clearing the session
+		return redirect(`/github/install`, {
+			headers: {
+				'Set-Cookie': await destroySession(session),
+			},
+		})
+	}
+	return null
+}
+
 export default function App() {
-	const actionData = useActionData<typeof action>()
 	const queryParams = useSearchParams()[0]
 	const navigation = useNavigation()
-	console.log(navigation.state)
 
-	const rawStream = useEventSource(`/github/stream?${queryParams.toString()}`, {
-		event: 'githubData',
-	})
-	const stream = rawStream ? (JSON.parse(rawStream) as { value: string }) : null
-	const streamText =
-		stream?.value !== 'UNKNOWN_EVENT_DATA' ? stream?.value || '' : ''
+	// TODO: clean this stuff up cause it's really ugly
+	// if no name put an ignore parameter there so backend ignores the request
+	const userName = queryParams.get('userName') || ''
+	const queryParamsToUse = userName
+		? queryParams
+		: new URLSearchParams({ ignore: '1' })
+	const rawStream = useEventSource(
+		`/github/stream?${queryParamsToUse.toString()}`,
+		{
+			event: 'githubData',
+		},
+	)
+
 	const [text, setText] = useState('')
 	useEffect(() => {
-		setText((prevText: string) => prevText + streamText)
-	}, [streamText])
+		const stream = rawStream ? (JSON.parse(rawStream) as StreamData) : null
+		if (stream?.action === 'data') {
+			const streamText =
+				stream?.value !== 'UNKNOWN_EVENT_DATA' ? stream?.value || '' : ''
+			setText((prevText: string) => prevText + streamText)
+		}
+	}, [rawStream])
 
-	// clear the text when the user presses submit
+	const [error, setError] = useState<string | null>(null)
+	useEffect(() => {
+		const stream = rawStream ? (JSON.parse(rawStream) as StreamData) : null
+		// if stream has error set error state
+		if (stream?.action === 'error') {
+			setError(stream.message)
+		}
+	}, [rawStream])
+
+	// clear the text when the user presses submitƒ
 	useEffect(() => {
 		if (navigation.state === 'loading') {
 			setText('')
@@ -106,6 +156,7 @@ export default function App() {
 					<Select
 						name="timePeriod"
 						defaultValue={queryParams.get('timePeriod') || ''}
+						required
 					>
 						<SelectTrigger className="mt-4 w-[180px] bg-background ">
 							<SelectValue placeholder="Time Period" />
@@ -117,7 +168,7 @@ export default function App() {
 						</SelectContent>
 					</Select>
 
-					{/* {error && <p className="text-red-500">{error}</p>} */}
+					{error && <p className="text-red-500">{error}</p>}
 					<Button type="submit" className="mt-4" disabled={disableButton}>
 						{disableButton && <Loader2 className="animate-spin" />}
 						Submit

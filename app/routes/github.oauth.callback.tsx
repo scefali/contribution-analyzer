@@ -4,9 +4,10 @@ import { commitSession, getSession } from '~/utils/session.server.ts'
 
 export async function loader({ request }: DataFunctionArgs) {
 	const url = new URL(request.url)
+	// TODO: error handling
 	const code = url.searchParams.get('code')
 	if (!code) {
-		return redirect('/install')
+		return redirect('/github/install')
 	}
 	const {
 		authentication: { token },

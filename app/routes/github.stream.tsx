@@ -7,21 +7,44 @@ import { TimePeriod } from '~/utils/github.ts'
 
 const BUFFER_SIZE = 10
 
+function streamResponse(
+	request: DataFunctionArgs['request'],
+	response: Object,
+) {
+	return eventStream(request.signal, function setup(send) {
+		send({
+			event: 'githubData',
+			data: JSON.stringify(response),
+		})
+		return () => {}
+	})
+}
+
+function streamErrorResponse(
+	request: DataFunctionArgs['request'],
+	message: string,
+) {
+	return streamResponse(request, {
+		action: 'error',
+		message,
+	})
+}
+
 export async function loader({ request }: DataFunctionArgs) {
 	const url = new URL(request.url)
+	// if we are to ignore then just return early
+	if (url.searchParams.get('ignore') === '1') {
+		return json({ status: 'ignore' })
+	}
+
 	const userName = url.searchParams.get('userName')
 	if (typeof userName !== 'string' || !userName) {
-		return json(
-			{ status: 'error', message: 'Invalid username' },
-			{ status: 400 },
-		)
+		return streamErrorResponse(request, 'Invalid username')
 	}
+
 	const timePeriod = url.searchParams.get('timePeriod') || '1w'
 	if (!Object.values(TimePeriod).includes(timePeriod as TimePeriod)) {
-		return json(
-			{ status: 'error', message: 'Invalid time period' },
-			{ status: 400 },
-		)
+		return streamErrorResponse(request, 'Invalid time period')
 	}
 	const timePeriod2Use = timePeriod as TimePeriod
 
@@ -44,16 +67,16 @@ export async function loader({ request }: DataFunctionArgs) {
 			.then(async generator => {
 				let count = 0
 				let buffer = []
-				console.log('start loop')
 				while (!quit) {
 					const newItem = await generator.next()
 					buffer.push(newItem.value)
 					if (buffer.length >= BUFFER_SIZE || newItem.done) {
-						console.log("sending buffer", buffer.join(''))
+						console.log('sending buffer', buffer.join(''))
 						send({
 							event: 'githubData',
 							data: JSON.stringify({
 								value: buffer.join(''),
+								action: 'data',
 								index: count,
 							}),
 						})

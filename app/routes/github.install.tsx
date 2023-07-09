@@ -1,14 +1,22 @@
 import React, { useState } from 'react'
 import { App } from 'octokit'
-import { json, type DataFunctionArgs } from '@remix-run/node'
+import { json, type DataFunctionArgs, redirect } from '@remix-run/node'
 import { Link } from '@remix-run/react'
 
 import Github from '~/images/github.tsx'
 
 import { useLoaderData } from '@remix-run/react'
+import { getSession } from '~/utils/session.server.ts'
 
-export function loader() {
-	const redirectUri = 'https://scefali.ngrok.io/github/oauth/callback'
+export async function loader({ request }: DataFunctionArgs) {
+	const session = await getSession(request.headers.get('Cookie'))
+	const githubCookie = session.get('github-auth')
+	if (githubCookie) {
+		// redirect to the app page
+		return redirect('/app')
+	}
+
+	const redirectUri = `${process.env.SERVER_URL}/github/oauth/callback`
 	const githubUrl = new URL('https://github.com/login/oauth/authorize')
 	// TODO: use oktokit to generate this url
 	githubUrl.searchParams.set('client_id', process.env.GITHUB_CLIENT_ID || '')
@@ -24,12 +32,12 @@ function GithubAppInstallationPage() {
 	return (
 		<div className="flex pt-14">
 			<div className="m-auto max-w-screen-sm">
-				<div className="rounded-sm p-36 shadow-sm bg-secondary border-solid">
+				<div className="rounded-sm border-solid bg-secondary p-36 shadow-sm">
 					<h1 className="text-xl font-bold">Connect your Github Account</h1>
-					<p className="text-sm text-muted-foreground mt-2">
+					<p className="text-sm mt-2 text-muted-foreground">
 						Connect your Github to get started with the Contribution Analyzer
 					</p>
-					<Link to={githubUrl} className="flex mt-4">
+					<Link to={githubUrl} className="mt-4 flex">
 						<Github className="my-auto mr-1" />
 						Install
 					</Link>
