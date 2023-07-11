@@ -31,8 +31,8 @@ function GithubAppInstallationPage() {
 	const { githubUrl } = useLoaderData()
 	return (
 		<div className="flex pt-14">
-			<div className="m-auto max-w-screen-sm">
-				<div className="rounded-sm border-solid bg-secondary p-36 shadow-sm">
+			<div className="m-auto max-w-screen-sm p-4">
+				<div className="rounded-sm border-solid bg-secondary p-4 shadow-sm">
 					<h1 className="text-xl font-bold">Connect your Github Account</h1>
 					<p className="text-sm mt-2 text-muted-foreground">
 						Connect your Github to get started with the Contribution Analyzer

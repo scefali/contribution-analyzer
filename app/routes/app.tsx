@@ -157,7 +157,6 @@ export default function App() {
 					className="m-auto rounded-sm bg-secondary p-8 "
 					action="/app"
 					method="GET"
-					style={{ width: '48rem' }}
 				>
 					<h1 className="text-lg font-bold">
 						See a Summary of Github Contributions

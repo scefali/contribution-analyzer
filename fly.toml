@@ -5,7 +5,7 @@
 
 app = "contribution-analyzer"
 kill_signal = "SIGINT"
-kill_timeout = 5
+kill_timeout = 30
 primary_region = "sjc"
 processes = []
 
