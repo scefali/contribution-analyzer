@@ -32,11 +32,7 @@ function streamErrorResponse(
 
 export async function loader({ request }: DataFunctionArgs) {
 	const url = new URL(request.url)
-	// if we are to ignore then just return early
-	if (url.searchParams.get('ignore') === '1') {
-		return json({ status: 'ignore' })
-	}
-
+	
 	const userName = url.searchParams.get('userName')
 	if (typeof userName !== 'string' || !userName) {
 		return streamErrorResponse(request, 'Invalid username')
