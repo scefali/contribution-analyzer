@@ -105,6 +105,7 @@ export default function App() {
 						<SelectContent>
 							<SelectItem value="1w">1 Week</SelectItem>
 							<SelectItem value="1m">1 Month</SelectItem>
+							<SelectItem value="3m">3 Months</SelectItem>
 							<SelectItem value="1y">1 Year</SelectItem>
 						</SelectContent>
 					</Select>

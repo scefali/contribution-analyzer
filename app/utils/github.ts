@@ -10,6 +10,7 @@ export type PullRequest = SearchIssuesResponseType['data']['items'][0]
 export enum TimePeriod {
 	OneWeek = '1w',
 	OneMonth = '1m',
+	ThreeMonths = '3m',
 	OneYear = '1y',
 }
 
@@ -43,6 +44,9 @@ export const generateSummary = async ({
 			break
 		case TimePeriod.OneMonth:
 			cutoffDate.setMonth(cutoffDate.getMonth() - 1)
+			break
+		case TimePeriod.ThreeMonths:
+			cutoffDate.setMonth(cutoffDate.getMonth() - 3)
 			break
 		case TimePeriod.OneYear:
 			cutoffDate.setFullYear(cutoffDate.getFullYear() - 1)
