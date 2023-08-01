@@ -18,13 +18,11 @@ export async function* generateSummaryForPrs({
 		if (pr) {
 			textBuffer.push(`Title: ${pr.title}`)
 			textBuffer.push(`Body: ${pr.body}`)
-			console.log(pr)
 		}
 		// if joined text buffer is > 1000 characters, then summarize
 		// and clear the buffer
 		const possiblePrompt = `
-		List the projects and features ${name} worked on. Give me human readable sentences.
-		Do it in the form of a list. ${textBuffer.join('')}`
+		Below is a list of titles and bodies of a PR which ${name} has done in the past week. Create a summary below in the form of a single list: ${textBuffer.join('')}`
 		if (possiblePrompt.length > 3000 || prs.length === 0) {
 			textBuffer = []
 			const generator = createSimpleCompletion(possiblePrompt)

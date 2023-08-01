@@ -39,6 +39,8 @@ export function useBufferedEventSource<Event extends BaseEvent>(
 
 		function handler(incomingEvent: MessageEvent) {
 			const data = JSON.parse(incomingEvent.data) as Event
+			console.log('data', data)
+			setBufferedData(bufferedData => [...(bufferedData ?? []), data as Event])
 			if (data.action === 'stop') {
 				console.log('stop')
 				setHasStopped(true)
@@ -49,7 +51,6 @@ export function useBufferedEventSource<Event extends BaseEvent>(
 				eventSource.removeEventListener(event, handler)
 				eventSource.close()
 			}
-			setBufferedData(bufferedData => [...(bufferedData ?? []), data as Event])
 		}
 		return () => {
 			eventSource.removeEventListener(event, handler)
@@ -58,13 +59,10 @@ export function useBufferedEventSource<Event extends BaseEvent>(
 	}, [url, event, init])
 
 	useEffect(() => {
-		if (!hasStopped) {
-			console.log('set timeout')
-			timeoutRef.current = window.setTimeout(() => {
-				setData(bufferedData)
-				setBufferedData([])
-			}, flushTime)
-		}
+		timeoutRef.current = window.setTimeout(() => {
+			setData(bufferedData)
+			setBufferedData([])
+		}, flushTime)
 		return () =>
 			timeoutRef.current ? window.clearTimeout(timeoutRef.current) : undefined
 	}, [flushTime, bufferedData, hasStopped])
