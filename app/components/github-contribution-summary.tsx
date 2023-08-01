@@ -16,6 +16,9 @@ type StreamData =
 			action: 'data'
 			value: string
 	  }
+	| {
+			action: 'stop'
+	  }
 
 function GithubContributionSummary({ userName, timePeriod }: Props) {
 	const navigation = useNavigation()
@@ -23,7 +26,7 @@ function GithubContributionSummary({ userName, timePeriod }: Props) {
 		userName,
 		timePeriod,
 	})
-	const rawStreamArray = useBufferedEventSource(
+	const streamArray = useBufferedEventSource<StreamData>(
 		`/github/stream?${queryParams.toString()}`,
 		{
 			event: 'githubData',
@@ -31,38 +34,24 @@ function GithubContributionSummary({ userName, timePeriod }: Props) {
 	)
 	const [text, setText] = useState('')
 	useEffect(() => {
-		const dataStreams = rawStreamArray.filter(rawStream => {
-			const stream = rawStream ? (JSON.parse(rawStream) as StreamData) : null
-			return stream?.action === 'data'
-		})
-		const dataStreamsText = dataStreams.map(rawStream => {
-			const stream = rawStream
-				? (JSON.parse(rawStream) as {
-						action: 'data'
-						value: string
-				  })
-				: null
+		const dataStreamsText = streamArray.map(stream => {
 			if (!stream) return ''
+			if (stream.action !== 'data') return ''
 			return stream.value
 		})
 		setText((prevText: string) => prevText + dataStreamsText.join(''))
-	}, [rawStreamArray])
+	}, [streamArray])
 
 	const [error, setError] = useState<string | null>(null)
 	useEffect(() => {
-		const errorStream = rawStreamArray.find(rawStream => {
-			const stream = rawStream ? (JSON.parse(rawStream) as StreamData) : null
+		const errorStream = streamArray.find(stream => {
 			return stream?.action === 'error'
 		})
 		// if stream has error set error state
-		if (errorStream) {
-			const stream = JSON.parse(errorStream) as {
-				action: 'error'
-				message: string
-			}
-			setError(stream.message)
+		if (errorStream && errorStream.action === 'error') {
+			setError(errorStream.message)
 		}
-	}, [rawStreamArray])
+	}, [streamArray])
 
 	// clear the text when the user presses submitƒ
 	useEffect(() => {

@@ -18,6 +18,7 @@ export async function* generateSummaryForPrs({
 		if (pr) {
 			textBuffer.push(`Title: ${pr.title}`)
 			textBuffer.push(`Body: ${pr.body}`)
+			console.log(pr)
 		}
 		// if joined text buffer is > 1000 characters, then summarize
 		// and clear the buffer

@@ -15,19 +15,19 @@ module.exports = {
 			center: true,
 			padding: '2rem',
 			screens: {
-				'sm': {'min': '640px', 'max': '767px'},
+				sm: { min: '640px', max: '767px' },
 				// => @media (min-width: 640px and max-width: 767px) { ... }
-	
-				'md': {'min': '768px', 'max': '1023px'},
+
+				md: { min: '768px', max: '1023px' },
 				// => @media (min-width: 768px and max-width: 1023px) { ... }
-	
-				'lg': {'min': '1024px', 'max': '1279px'},
+
+				lg: { min: '1024px', max: '1279px' },
 				// => @media (min-width: 1024px and max-width: 1279px) { ... }
-	
-				'xl': {'min': '1280px', 'max': '1535px'},
+
+				xl: { min: '1280px', max: '1535px' },
 				// => @media (min-width: 1280px and max-width: 1535px) { ... }
-	
-				'2xl': {'min': '1536px'},
+
+				'2xl': { min: '1536px' },
 				// => @media (min-width: 1536px) { ... }
 			},
 		},
@@ -130,6 +130,9 @@ module.exports = {
 			caption: ['1.125rem', { lineHeight: '1.5rem', fontWeight: '600' }],
 			/** 12px size / 16px high / bold */
 			button: ['0.75rem', { lineHeight: '1rem', fontWeight: '700' }],
+		},
+		width: {
+			'150': '600px',
 		},
 	},
 	plugins: [require('tailwindcss-animate'), tailwindcssRadix],

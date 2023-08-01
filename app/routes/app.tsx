@@ -77,7 +77,7 @@ export default function App() {
 	const disableButton = false
 	return (
 		<div className="flex flex-col items-center p-4">
-			<div className="max-w-2xl">
+			<div className="w-150">
 				<Form
 					className="m-auto rounded-sm bg-secondary p-8 "
 					action="/app"

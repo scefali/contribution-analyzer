@@ -2,9 +2,17 @@ import { useEffect, useState, useRef } from 'react'
 
 type EventSourceOptions = {
 	init?: EventSourceInit
-	event?: string
+	event: string
 	flushTime?: number
 }
+
+type BaseEvent =
+	| {
+			action: 'stop'
+	  }
+	| ({
+			action: string
+	  } & Record<string, unknown>)
 
 /**
  * Subscribe to an event source and return the latest event.
@@ -12,39 +20,54 @@ type EventSourceOptions = {
  * @param options The options to pass to the EventSource constructor
  * @returns The last event received from the server
  */
-export function useBufferedEventSource(
+export function useBufferedEventSource<Event extends BaseEvent>(
 	url: string | URL,
-	{ event = 'message', init, flushTime = 200 }: EventSourceOptions = {},
+	{ event, init, flushTime = 100 }: EventSourceOptions,
 ) {
 	const timeoutRef = useRef<number | null>(null)
-	const [data, setData] = useState<Array<string | null>>([])
-	const [rawData, setRawData] = useState<Array<string | null>>([])
+	const [data, setData] = useState<Array<Event | null>>([])
+	const [bufferedData, setBufferedData] = useState<Array<Event | null>>([])
+	const [hasStopped, setHasStopped] = useState(false)
 
 	useEffect(() => {
 		const eventSource = new EventSource(url, init)
-		eventSource.addEventListener(event ?? 'message', handler)
+		eventSource.addEventListener(event, handler)
+		console.log('add event listener', event)
 
 		// reset data if dependencies change
-		setRawData([])
+		setBufferedData([])
 
-		function handler(event: MessageEvent) {
-			setRawData(rawData => [...(rawData ?? []), event.data])
+		function handler(incomingEvent: MessageEvent) {
+			const data = JSON.parse(incomingEvent.data) as Event
+			if (data.action === 'stop') {
+				console.log('stop')
+				setHasStopped(true)
+				if (timeoutRef.current) {
+					clearTimeout(timeoutRef.current)
+					timeoutRef.current = null
+				}
+				eventSource.removeEventListener(event, handler)
+				eventSource.close()
+			}
+			setBufferedData(bufferedData => [...(bufferedData ?? []), data as Event])
 		}
 		return () => {
-			eventSource.removeEventListener(event ?? 'message', handler)
+			eventSource.removeEventListener(event, handler)
 			eventSource.close()
 		}
 	}, [url, event, init])
 
 	useEffect(() => {
-		timeoutRef.current = window.setTimeout(() => {
-      console.log('send data', rawData)
-			setData(rawData)
-      setRawData([])
-		}, flushTime)
+		if (!hasStopped) {
+			console.log('set timeout')
+			timeoutRef.current = window.setTimeout(() => {
+				setData(bufferedData)
+				setBufferedData([])
+			}, flushTime)
+		}
 		return () =>
 			timeoutRef.current ? window.clearTimeout(timeoutRef.current) : undefined
-	}, [flushTime, rawData])
+	}, [flushTime, bufferedData, hasStopped])
 
 	return data
 }

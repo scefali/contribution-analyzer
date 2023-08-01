@@ -32,7 +32,7 @@ function streamErrorResponse(
 
 export async function loader({ request }: DataFunctionArgs) {
 	const url = new URL(request.url)
-	
+
 	const userName = url.searchParams.get('userName')
 	if (typeof userName !== 'string' || !userName) {
 		return streamErrorResponse(request, 'Invalid username')
@@ -78,6 +78,12 @@ export async function loader({ request }: DataFunctionArgs) {
 						})
 						// quit if we are done
 						if (newItem.done) {
+							send({
+								event: 'githubData',
+								data: JSON.stringify({
+									action: 'stop',
+								}),
+							})
 							console.log('done')
 							return
 						}
