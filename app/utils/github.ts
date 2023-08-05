@@ -89,3 +89,8 @@ export const getUser = async ({
 	const client = getClient(githubCookie)
 	return client.rest.users.getByUsername({ username: userName })
 }
+
+export const getMyUser = async ({ githubCookie }: { githubCookie: string }) => {
+	const client = getClient(githubCookie)
+	return client.rest.users.getAuthenticated()
+}

@@ -7,9 +7,24 @@ generator client {
   provider = "prisma-client-js"
 }
 
-
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+  id           Int          @id @default(autoincrement())
+  githubUserId Int          @unique
+  email        String?
+  name         String?
+  avatarUrl    String
+  TeamMember   TeamMember[]
+}
+
+model TeamMember {
+  id             Int     @id @default(autoincrement())
+  owner          User    @relation(fields: [ownerId], references: [id])
+  ownerId        Int
+  gitHubUserName String
+  avatarUrl      String
+  bio            String?
+  name           String?
+
+  @@unique([ownerId, gitHubUserName])
+  @@index([ownerId])
 }

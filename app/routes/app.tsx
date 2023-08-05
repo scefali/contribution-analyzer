@@ -5,19 +5,14 @@ import {
 	redirect,
 } from '@remix-run/node'
 import { Loader2 } from 'lucide-react'
-import { Suspense, useEffect, useState } from 'react'
 
 import {
-	Await,
 	Form,
-	useActionData,
-	useNavigation,
-	useLoaderData,
 	useSearchParams,
 } from '@remix-run/react'
 
-import { TimePeriod, generateSummary, getUser } from '~/utils/github.ts'
-import { getSession } from '~/utils/session.server.ts'
+import { getMyUser } from '~/utils/github.ts'
+import { getSession, destroySession } from '~/utils/session.server.ts'
 import { Input } from '~/@/components/ui/input.tsx'
 import { Button } from '~/@/components/ui/button.tsx'
 import {
@@ -27,8 +22,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '~/@/components/ui/select.tsx'
-import { destroySession } from '~/utils/session.server.ts'
-import { useBufferedEventSource } from '~/utils/use-buffered-event-source.ts'
 import GithubContributionSummary from '~/components/github-contribution-summary.tsx'
 
 type ActionData =
@@ -56,7 +49,8 @@ export async function loader({ request }: DataFunctionArgs) {
 
 	// check if our token is still valid when the page laods
 	try {
-		await getUser({ userName: 'scefali', githubCookie })
+		// check if token still valid
+		await getMyUser({ githubCookie })
 	} catch (e) {
 		// TODO: better error handling
 		// if not, redirect to the the install page after clearing the session
@@ -88,7 +82,7 @@ export default function App() {
 					</h1>
 					<Input
 						type="text"
-						placeholder="Type in GitHub Username"
+						placeholder="GitHub Username"
 						name="userName"
 						className="mt-4 max-w-md"
 						required

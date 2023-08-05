@@ -12,7 +12,7 @@
     "prisma:studio": "prisma studio",
     "format": "prettier --write .",
     "lint": "eslint .",
-    "setup": "prisma generate && prisma migrate deploy && prisma db seed && playwright install",
+    "setup": "prisma generate && prisma migrate deploy && playwright install",
     "start": "cross-env NODE_ENV=production node .",
     "start:mocks": "cross-env NODE_ENV=production MOCKS=true tsx .",
     "test": "vitest",
@@ -143,9 +143,6 @@
     "node": "18"
   },
   "epic-stack": true,
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
-  },
   "volta": {
     "node": "18.16.1"
   }
