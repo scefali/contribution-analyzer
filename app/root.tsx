@@ -20,6 +20,7 @@ import { useTheme } from './components/theme/index.tsx'
 import { getTheme } from './components/theme/theme-session.server.ts'
 import fontStylestylesheetUrl from './styles/font.css'
 import tailwindStylesheetUrl from './styles/tailwind.css'
+import mainStyleSheetUrl from './styles/main.css'
 import { ClientHintCheck, getHints } from './utils/client-hints.tsx'
 import { getEnv } from './utils/env.server.ts'
 import { getDomainUrl } from './utils/misc.server.ts'
@@ -49,6 +50,7 @@ export const links: LinksFunction = () => {
 		},
 		{ rel: 'stylesheet', href: fontStylestylesheetUrl },
 		{ rel: 'stylesheet', href: tailwindStylesheetUrl },
+		{ rel: 'stylesheet', href: mainStyleSheetUrl },
 		cssBundleHref ? { rel: 'stylesheet', href: cssBundleHref } : null,
 	].filter(Boolean)
 }

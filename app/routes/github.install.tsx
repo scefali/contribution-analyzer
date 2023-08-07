@@ -13,7 +13,7 @@ export async function loader({ request }: DataFunctionArgs) {
 	const githubCookie = session.get('github-auth')
 	if (githubCookie) {
 		// redirect to the app page
-		return redirect('/app')
+		return redirect('/app/summary')
 	}
 
 	const redirectUri = `${process.env.SERVER_URL}/github/oauth/callback`

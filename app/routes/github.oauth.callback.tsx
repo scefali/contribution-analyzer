@@ -37,7 +37,7 @@ export async function loader({ request }: DataFunctionArgs) {
 	const session = await getSession(request.headers.get('Cookie'))
 	session.set('github-auth', token)
 	session.set('user-id', user.id)
-	return redirect('/app', {
+	return redirect('/app/summary', {
 		headers: { 'Set-Cookie': await commitSession(session) },
 	})
 }
