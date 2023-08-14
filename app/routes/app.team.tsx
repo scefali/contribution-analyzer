@@ -82,7 +82,7 @@ export default function Team() {
 				<Form
 					className="m-auto rounded-sm bg-secondary p-8"
 					// eslint-disable-next-line remix-react-routes/require-valid-paths
-					action="/team"
+					action="/app/team"
 					method="POST"
 				>
 					<h1 className="text-lg font-bold">Add a GitHub User to Team</h1>
@@ -95,6 +95,11 @@ export default function Team() {
 					/>
 					<Button type="submit" className="mt-4">
 						Add to Team
+					</Button>
+				</Form>
+				<Form method="POST" action="/app/team/generate-report">
+					<Button type="submit" className="mt-4">
+						Generate Report
 					</Button>
 				</Form>
 				<div className="mt-8">

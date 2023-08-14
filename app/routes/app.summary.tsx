@@ -74,7 +74,7 @@ export default function Summary() {
 			<div className="w-150">
 				<Form
 					className="m-auto rounded-sm bg-secondary p-8 "
-					action="/app"
+					action="/app/summary"
 					method="GET"
 				>
 					<h1 className="text-lg font-bold">

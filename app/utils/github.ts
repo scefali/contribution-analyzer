@@ -26,15 +26,13 @@ export const getClient = (authToken: string) => {
 	})
 }
 
-export const generateSummary = async ({
+export const getPrsForSummary = async ({
 	userName,
 	githubCookie,
-	name,
 	timePeriod,
 }: {
 	userName: string
 	githubCookie: string
-	name: string
 	timePeriod: TimePeriod
 }) => {
 	const cutoffDate = new Date()
@@ -74,6 +72,22 @@ export const generateSummary = async ({
 		const prDate = new Date(pr.closed_at)
 		return prDate >= cutoffDate
 	})
+	return prs
+}
+
+export const generateSummary = async ({
+	userName,
+	githubCookie,
+	name,
+	timePeriod,
+}: {
+	userName: string
+	githubCookie: string
+	name: string
+	timePeriod: TimePeriod
+}) => {
+	const prs = await getPrsForSummary({ userName, githubCookie, timePeriod })
+
 	console.group("considering these pr's", prs.length)
 
 	return generateSummaryForPrs({ prs, name })
