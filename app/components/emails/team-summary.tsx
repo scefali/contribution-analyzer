@@ -11,9 +11,12 @@ import {
   Text,
 } from '@react-email/components';
 import * as React from 'react';
+import {TeamMember} from '~/utils/types';
 
 interface TeamSummaryProps {
   username?: string;
+  teamMembers: TeamMember[];
+  summaryList: string[];
 }
 
 const baseUrl = process.env.VERCEL_URL

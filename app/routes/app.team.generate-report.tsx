@@ -6,7 +6,11 @@ import {
 } from '@remix-run/node'
 
 import { sendEmail } from '~/utils/email.server.ts'
-import { TimePeriod, getPrsForSummary } from '~/utils/github.ts'
+import {
+	TimePeriod,
+	generateSummary,
+	getPrsForSummary,
+} from '~/utils/github.ts'
 
 import TeamSummary from '~/components/emails/team-summary.tsx'
 import { getSession } from '~/utils/session.server.ts'
@@ -27,38 +31,31 @@ export async function action({
 			ownerId: userId,
 		},
 	})
-	const prsPerUser = await Promise.all(
+	const summaryList = await Promise.all(
 		teamMembers.map(async member => {
-			const prs = await getPrsForSummary({
+			const iterator = await generateSummary({
+				name: member.name || 'Unknown',
 				githubCookie: session.get('github-auth'),
 				userName: member.gitHubUserName,
 				timePeriod: TimePeriod.OneWeek,
 			})
-			return prs
+			const output = []
+			for await (const value of iterator) {
+				output.push(value)
+			}
+			return output.join('')
 		}),
 	)
-  console.log(prsPerUser)
+	console.log(summaryList)
 
 	const { status, error } = await sendEmail({
-		react: <TeamSummary />,
+		react: <TeamSummary summaryList={summaryList} teamMembers={teamMembers} />,
 		to: 'scefali@sentry.io',
 		subject: 'subject',
 	})
 
-	console.log({ status, error })
 	if (status !== 'success') {
-		return {
-			status: 500,
-			payload: {
-				status: 'error',
-				message: 'Something went wrong',
-			},
-		}
+		return json({ status: 'error', message: error.message }, { status: 400 })
 	}
-	return {
-		status: 200,
-		payload: {
-			status: 'success',
-		},
-	}
+	return json({ status: 'success' })
 }

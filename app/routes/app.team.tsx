@@ -14,6 +14,7 @@ import {
 	useNavigation,
 	useLoaderData,
 	useSearchParams,
+	useFetcher,
 } from '@remix-run/react'
 
 import { getUser, getMyUser } from '~/utils/github.ts'
@@ -76,6 +77,8 @@ export async function loader({ request }: DataFunctionArgs) {
 
 export default function Team() {
 	const { teamMembers } = useLoaderData<ReturnType<typeof loader>>()
+	const fetcher = useFetcher()
+	console.log({ fetcher })
 	return (
 		<div className="flex flex-col items-center p-4">
 			<div className="w-150">
@@ -97,11 +100,15 @@ export default function Team() {
 						Add to Team
 					</Button>
 				</Form>
-				<Form method="POST" action="/app/team/generate-report">
-					<Button type="submit" className="mt-4">
+				<fetcher.Form method="POST" action="/app/team/generate-report">
+					<Button
+						type="submit"
+						className="mt-4"
+						disabled={fetcher.state !== 'idle'}
+					>
 						Generate Report
 					</Button>
-				</Form>
+				</fetcher.Form>
 				<div className="mt-8">
 					<h2 className="text-lg font-bold">Team Members:</h2>
 					<ul className="mt-4 space-y-4">
