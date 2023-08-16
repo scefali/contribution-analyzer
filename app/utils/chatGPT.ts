@@ -1,6 +1,7 @@
 /// `ChatGPT.tsx` from https://github.com/openai/openai-node/issues/18
 import { type CreateCompletionResponse, Configuration, OpenAIApi } from 'openai'
 import { type IncomingMessage } from 'http'
+import {setCache, getCache} from '~/utils/redis.ts'
 
 const configuration = new Configuration({
 	apiKey: process.env.OPENAI_API_KEY,
@@ -48,7 +49,7 @@ async function* streamCompletion(
 	yield* linesToMessages(chunksToLines(data))
 }
 
-export async function* createSimpleCompletion(prompt: string) {
+export async function* createSimpleCompletionNoCache(prompt: string) {
 	const completion = await OpenAI.createCompletion(
 		{
 			model: 'text-davinci-003',
@@ -76,4 +77,20 @@ export async function* createSimpleCompletion(prompt: string) {
 		} catch (error) {
 			console.error('Could not JSON parse stream message', message, error)
 		}
+}
+
+
+export async function* createSimpleCompletion(prompt: string) {
+	const cached = await getCache(prompt)
+	if (cached) {
+		yield cached
+		return
+	}
+	const result = createSimpleCompletionNoCache(prompt)
+	const output = []
+	for await (const message of result) {
+		output.push(message)
+		yield message
+	}
+	await setCache(prompt, output.join(''))
 }
