@@ -106,6 +106,7 @@ export default function Team() {
 						className="mt-4"
 						disabled={fetcher.state !== 'idle'}
 					>
+						{fetcher.state !== 'idle' && <Loader2 className="animate-spin" />}
 						Generate Report
 					</Button>
 				</fetcher.Form>
