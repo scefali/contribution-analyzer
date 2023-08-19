@@ -31,7 +31,7 @@ export async function sendEmail({
 	| { html: string; text: string; react?: never }
 	| { react: ReactElement; html?: never; text?: never }
 )) {
-	const from = 'hello@contribution-analyzer.dev'
+	const from = 'hello@contribution-analyzer.live'
 
 	const email = {
 		from,

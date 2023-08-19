@@ -45,7 +45,6 @@ export async function action({
 	const userId: number = session.get('user-id')
 
 	const { data: gitHubUser } = await getUser({ userName, githubCookie })
-	console.log(gitHubUser)
 
 	await prisma.teamMember.create({
 		data: {
@@ -78,7 +77,6 @@ export async function loader({ request }: DataFunctionArgs) {
 export default function Team() {
 	const { teamMembers } = useLoaderData<ReturnType<typeof loader>>()
 	const fetcher = useFetcher()
-	console.log({ fetcher })
 	return (
 		<div className="flex flex-col items-center p-4">
 			<div className="w-150">
@@ -96,7 +94,12 @@ export default function Team() {
 						required
 						name="userName"
 					/>
-					<Button type="submit" className="mt-4">
+					<Button
+						type="submit"
+						className="mt-4"
+						disabled={fetcher.state !== 'idle'}
+					>
+						{fetcher.state !== 'idle' && <Loader2 className="animate-spin" />}
 						Add to Team
 					</Button>
 				</Form>
