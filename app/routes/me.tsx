@@ -14,5 +14,5 @@ export async function loader({ request }: DataFunctionArgs) {
 		await authenticator.logout(request, { redirectTo })
 		return redirect(redirectTo)
 	}
-	return redirect(`/users/${user.username}`)
+	return redirect(`/users/${user.name}`)
 }

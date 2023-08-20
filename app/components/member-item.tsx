@@ -1,6 +1,6 @@
-import type { TeamMember } from '~/utils/types.ts'
+import type { TeamMember } from '~/utils/types'
 
-import { FaTrash } from 'react-icons/fa/index.ts'
+import { FaTrash } from 'react-icons/fa'
 import { useFetcher } from '@remix-run/react'
 
 interface Props {
