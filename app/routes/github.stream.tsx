@@ -59,6 +59,7 @@ export async function loader({ request }: DataFunctionArgs) {
 			name: name2Use,
 			githubCookie,
 			timePeriod: timePeriod2Use,
+			userId: session.get('user-id'),
 		})
 			.then(async generator => {
 				let count = 0
@@ -95,8 +96,14 @@ export async function loader({ request }: DataFunctionArgs) {
 				console.log('post quit')
 			})
 			.catch(err => {
-				console.log('here')
-				console.error(err)
+				console.log(err)
+				send({
+					event: 'githubData',
+					data: JSON.stringify({
+						action: 'error',
+						message: err.message,
+					}),
+				})
 			})
 		return () => {
 			quit = true

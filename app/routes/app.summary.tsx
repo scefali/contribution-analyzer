@@ -70,7 +70,7 @@ export default function Summary() {
 	const timePeriod = queryParams.get('timePeriod')
 	const navigation = useNavigation()
 	const submitting = navigation.state === 'submitting'
-	const disableButton = !userName || !timePeriod || submitting
+	const disableButton =  submitting
 	return (
 		<div className="flex flex-col items-center p-4">
 			<div className="w-150">

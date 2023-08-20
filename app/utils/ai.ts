@@ -6,10 +6,12 @@ export async function* generateSummaryForPrs({
 	name,
 	prs,
 	customPrompt,
+	userId,
 }: {
 	prs: PullRequest[]
 	name: string
 	customPrompt?: string
+	userId: number
 }) {
 	let textBuffer = []
 	// const output = []
@@ -27,11 +29,11 @@ export async function* generateSummaryForPrs({
 		// and clear the buffer
 		const possiblePrompt = `
 		Below is a list of titles and bodies of a PR which ${name} has done in the past week.
-		 Create a summary below in the form of a single list. ${customPrompt}: 
+		 Create a summary below in the form of a single list only using the data given. ${customPrompt}: 
 		 ${textBuffer.join('')}`
 		if (possiblePrompt.length > 3000 || prs.length === 0) {
 			textBuffer = []
-			const generator = createSimpleCompletion(possiblePrompt)
+			const generator = createSimpleCompletion(possiblePrompt, userId)
 			while (true) {
 				const newItem = await generator.next()
 				if (newItem.done) {
