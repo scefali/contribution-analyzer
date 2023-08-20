@@ -9,6 +9,8 @@ import { useLoaderData } from '@remix-run/react'
 import { getSession } from '~/utils/session.server.ts'
 
 export async function loader({ request }: DataFunctionArgs) {
+	const urlObj = new URL(request.url)
+	console.log(urlObj)
 	const session = await getSession(request.headers.get('Cookie'))
 	const githubCookie = session.get('github-auth')
 	if (githubCookie) {
@@ -16,7 +18,8 @@ export async function loader({ request }: DataFunctionArgs) {
 		return redirect('/app/summary')
 	}
 
-	const redirectUri = `${process.env.SERVER_URL}/github/oauth/callback`
+	
+	const redirectUri = `https://${urlObj.host}/github/oauth/callback`
 	const githubUrl = new URL('https://github.com/login/oauth/authorize')
 	// TODO: use oktokit to generate this url
 	githubUrl.searchParams.set('client_id', process.env.GITHUB_CLIENT_ID || '')

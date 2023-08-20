@@ -90,16 +90,15 @@ export async function* createSimpleCompletionNoCache(prompt: string) {
 export async function* createSimpleCompletion(prompt: string, userId: number) {
 	// If the result is cached, we don't have to rate limit
 	const cached = await getCache(prompt)
-	// if (cached) {
-	// 	console.log('cached')
-	// 	yield cached
-	// 	return
-	// }
+	if (cached) {
+		console.log('cached')
+		yield cached
+		return
+	}
 
 	// Increment and check rate limit
 	const currentTimestamp = Date.now()
 	const startOfDay = new Date().setHours(0, 0, 0, 0)
-	const endOfDay = new Date().setHours(23, 59, 59, 999)
 	const rateLimitKey = `llm_user_rate_limit:${userId}`
 
 	const rateLimitCountJson = await getCache(rateLimitKey)
