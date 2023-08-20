@@ -8,6 +8,7 @@ import { Loader2 } from 'lucide-react'
 
 import {
 	Form,
+	useNavigation,
 	useSearchParams,
 } from '@remix-run/react'
 
@@ -67,8 +68,9 @@ export default function Summary() {
 	const queryParams = useSearchParams()[0]
 	const userName = queryParams.get('userName')
 	const timePeriod = queryParams.get('timePeriod')
-
-	const disableButton = false
+	const navigation = useNavigation()
+	const submitting = navigation.state === 'submitting'
+	const disableButton = !userName || !timePeriod || submitting
 	return (
 		<div className="flex flex-col items-center p-4">
 			<div className="w-150">
@@ -104,7 +106,7 @@ export default function Summary() {
 						</SelectContent>
 					</Select>
 					<Button type="submit" className="mt-4" disabled={disableButton}>
-						{disableButton && <Loader2 className="animate-spin" />}
+						{submitting && <Loader2 className="animate-spin" />}
 						Submit
 					</Button>
 					{userName && timePeriod && (

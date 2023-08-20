@@ -80,17 +80,19 @@ export const generateSummary = async ({
 	githubCookie,
 	name,
 	timePeriod,
+	customPrompt,
 }: {
 	userName: string
 	githubCookie: string
 	name: string
 	timePeriod: TimePeriod
+	customPrompt?: string
 }) => {
 	const prs = await getPrsForSummary({ userName, githubCookie, timePeriod })
 
 	console.group("considering these pr's", prs.length)
 
-	return generateSummaryForPrs({ prs, name })
+	return generateSummaryForPrs({ prs, name, customPrompt })
 }
 
 export const getUser = async ({

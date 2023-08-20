@@ -17,6 +17,7 @@ import {
 	useFetcher,
 } from '@remix-run/react'
 import { Prisma } from '@prisma/client'
+import { RequestError } from 'octokit'
 
 import { getUser, getMyUser } from '~/utils/github.ts'
 import { getSession } from '~/utils/session.server.ts'
@@ -45,9 +46,8 @@ export async function action({
 	const githubCookie: string = session.get('github-auth')
 	const userId: number = session.get('user-id')
 
-	const { data: gitHubUser } = await getUser({ userName, githubCookie })
-
 	try {
+		const { data: gitHubUser } = await getUser({ userName, githubCookie })
 		await prisma.teamMember.create({
 			data: {
 				name: gitHubUser.name,
@@ -66,6 +66,13 @@ export async function action({
 			if (e.code === 'P2002') {
 				return json(
 					{ status: 'error', message: 'Team member already exists' },
+					{ status: 400 },
+				)
+			}
+		} else if (e instanceof RequestError) {
+			if (e.status === 404) {
+				return json(
+					{ status: 'error', message: 'GitHub user not found' },
 					{ status: 400 },
 				)
 			}
@@ -93,8 +100,6 @@ export default function Team() {
 	const fetcher = useFetcher()
 	const navigation = useNavigation()
 	const actionData = useActionData<ActionData>()
-	console.log('actionData', actionData)	
-	console.log('state', navigation.state)
 	return (
 		<div className="flex flex-col items-center p-4">
 			<div className="w-150">
@@ -115,9 +120,11 @@ export default function Team() {
 					<Button
 						type="submit"
 						className="mt-4"
-						disabled={fetcher.state !== 'idle'}
+						disabled={navigation.state === 'submitting'}
 					>
-						{fetcher.state !== 'idle' && <Loader2 className="animate-spin" />}
+						{navigation.state === 'submitting' && (
+							<Loader2 className="animate-spin" />
+						)}
 						Add to Team
 					</Button>
 					{actionData && actionData.status === 'error' && (
@@ -128,9 +135,11 @@ export default function Team() {
 					<Button
 						type="submit"
 						className="mt-4"
-						disabled={fetcher.state !== 'idle'}
+						disabled={fetcher.state === 'submitting'}
 					>
-						{fetcher.state !== 'idle' && <Loader2 className="animate-spin" />}
+						{fetcher.state === 'submitting' && (
+							<Loader2 className="animate-spin" />
+						)}
 						Generate Weekly Report
 					</Button>
 					<div className="mt-2">

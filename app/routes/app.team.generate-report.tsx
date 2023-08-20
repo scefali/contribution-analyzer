@@ -38,6 +38,7 @@ export async function action({
 				githubCookie: session.get('github-auth'),
 				userName: member.gitHubUserName,
 				timePeriod: TimePeriod.OneWeek,
+				customPrompt: 'Include links to the PRs for each item'
 			})
 			const output = []
 			for await (const value of iterator) {
@@ -51,7 +52,7 @@ export async function action({
 	const { status, error } = await sendEmail({
 		react: <TeamSummary summaryList={summaryList} teamMembers={teamMembers} />,
 		to: 'scefali@sentry.io',
-		subject: 'subject',
+		subject: 'Github Contribution Report for Team',
 	})
 
 	if (status !== 'success') {

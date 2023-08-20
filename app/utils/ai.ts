@@ -1,12 +1,15 @@
+import { text } from 'stream/consumers'
 import { createSimpleCompletion } from './chatGPT.ts'
 import type { PullRequest } from './github.ts'
 
 export async function* generateSummaryForPrs({
 	name,
 	prs,
+	customPrompt,
 }: {
 	prs: PullRequest[]
 	name: string
+	customPrompt?: string
 }) {
 	let textBuffer = []
 	// const output = []
@@ -18,11 +21,14 @@ export async function* generateSummaryForPrs({
 		if (pr) {
 			textBuffer.push(`Title: ${pr.title}`)
 			textBuffer.push(`Body: ${pr.body}`)
+			textBuffer.push(`Link: ${pr.html_url}`)
 		}
 		// if joined text buffer is > 1000 characters, then summarize
 		// and clear the buffer
 		const possiblePrompt = `
-		Below is a list of titles and bodies of a PR which ${name} has done in the past week. Create a summary below in the form of a single list: ${textBuffer.join('')}`
+		Below is a list of titles and bodies of a PR which ${name} has done in the past week.
+		 Create a summary below in the form of a single list. ${customPrompt}: 
+		 ${textBuffer.join('')}`
 		if (possiblePrompt.length > 3000 || prs.length === 0) {
 			textBuffer = []
 			const generator = createSimpleCompletion(possiblePrompt)

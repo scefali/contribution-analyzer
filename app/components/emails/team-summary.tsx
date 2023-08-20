@@ -7,9 +7,9 @@ import {
 	Preview,
 	Section,
 	Text,
-  Heading
+	Heading,
 } from '@react-email/components'
-import { TeamMember } from '~/utils/types.tsx'
+import { type TeamMember } from '~/utils/types.tsx'
 
 import Github from '~/images/github.tsx'
 
@@ -17,8 +17,6 @@ interface TeamSummaryProps {
 	teamMembers: TeamMember[]
 	summaryList: string[]
 }
-
-
 
 export const TeamSummary = ({ teamMembers, summaryList }: TeamSummaryProps) => (
 	<Html>
@@ -29,10 +27,23 @@ export const TeamSummary = ({ teamMembers, summaryList }: TeamSummaryProps) => (
 				<Github />
 				{teamMembers.map((member, index) => {
 					const summary = summaryList[index]
+					const chunks = summary.split('\n').map(chunk => chunk.trim())
 					return (
 						<Section key={index}>
-							<Link href={`https://github.com/${member.gitHubUserName}`}><Heading>{member.name}</Heading></Link>
-							<Text>{summary}</Text>
+							<Link href={`https://github.com/${member.gitHubUserName}`}>
+								<Heading>{member.name}</Heading>
+							</Link>
+							{chunks.map((chunk, index) => {
+								if (!chunk) {
+									return null
+								}
+								return (
+									<Text key={index}>
+										{chunk}
+										<br />
+									</Text>
+								)
+							})}
 						</Section>
 					)
 				})}
