@@ -16,6 +16,7 @@ import {
 	useSearchParams,
 	useFetcher,
 } from '@remix-run/react'
+import { Prisma } from '@prisma/client'
 
 import { getUser, getMyUser } from '~/utils/github.ts'
 import { getSession } from '~/utils/session.server.ts'
@@ -46,18 +47,31 @@ export async function action({
 
 	const { data: gitHubUser } = await getUser({ userName, githubCookie })
 
-	await prisma.teamMember.create({
-		data: {
-			name: gitHubUser.name,
-			avatarUrl: gitHubUser.avatar_url,
-			gitHubUserName: gitHubUser.login,
-			owner: {
-				connect: {
-					id: userId,
+	try {
+		await prisma.teamMember.create({
+			data: {
+				name: gitHubUser.name,
+				avatarUrl: gitHubUser.avatar_url,
+				gitHubUserName: gitHubUser.login,
+				owner: {
+					connect: {
+						id: userId,
+					},
 				},
 			},
-		},
-	})
+		})
+	} catch (e: unknown) {
+		console.log(e)
+		if (e instanceof Prisma.PrismaClientKnownRequestError) {
+			if (e.code === 'P2002') {
+				return json(
+					{ status: 'error', message: 'Team member already exists' },
+					{ status: 400 },
+				)
+			}
+		}
+		return json({ status: 'error', message: 'Unknown error' }, { status: 500 })
+	}
 
 	return json({ status: 'success' })
 }
@@ -77,6 +91,10 @@ export async function loader({ request }: DataFunctionArgs) {
 export default function Team() {
 	const { teamMembers } = useLoaderData<ReturnType<typeof loader>>()
 	const fetcher = useFetcher()
+	const navigation = useNavigation()
+	const actionData = useActionData<ActionData>()
+	console.log('actionData', actionData)	
+	console.log('state', navigation.state)
 	return (
 		<div className="flex flex-col items-center p-4">
 			<div className="w-150">
@@ -102,6 +120,9 @@ export default function Team() {
 						{fetcher.state !== 'idle' && <Loader2 className="animate-spin" />}
 						Add to Team
 					</Button>
+					{actionData && actionData.status === 'error' && (
+						<div className="mt-4 text-red-500">{actionData.message}</div>
+					)}
 				</Form>
 				<fetcher.Form method="POST" action="/app/team/generate-report">
 					<Button
@@ -110,8 +131,11 @@ export default function Team() {
 						disabled={fetcher.state !== 'idle'}
 					>
 						{fetcher.state !== 'idle' && <Loader2 className="animate-spin" />}
-						Generate Report
+						Generate Weekly Report
 					</Button>
+					<div className="mt-2">
+						Emails you the weekly report for all team members.
+					</div>
 				</fetcher.Form>
 				<div className="mt-8">
 					<h2 className="text-lg font-bold">Team Members:</h2>

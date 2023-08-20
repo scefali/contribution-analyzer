@@ -83,9 +83,11 @@ export async function* createSimpleCompletionNoCache(prompt: string) {
 export async function* createSimpleCompletion(prompt: string) {
 	const cached = await getCache(prompt)
 	if (cached) {
+		console.log('cached')
 		yield cached
 		return
 	}
+	console.log('not cached')
 	const result = createSimpleCompletionNoCache(prompt)
 	const output = []
 	for await (const message of result) {
