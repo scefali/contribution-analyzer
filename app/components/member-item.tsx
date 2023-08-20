@@ -1,6 +1,6 @@
 import type { TeamMember } from '~/utils/types.ts'
 
-import { FaTrashCan } from 'react-icons/fa6'
+import { FaTrash } from 'react-icons/fa/index.ts'
 import { useFetcher } from '@remix-run/react'
 
 interface Props {
@@ -22,7 +22,7 @@ export default function MemberItem({ teamMember }: Props) {
 			<div className="my-auto">
 				<fetcher.Form action={`/app/team/${teamMember.id}`} method="DELETE">
 					<button type="submit">
-						<FaTrashCan />
+						<FaTrash />
 					</button>
 				</fetcher.Form>
 			</div>
