@@ -22,7 +22,7 @@ type BaseEvent =
  */
 export function useBufferedEventSource<Event extends BaseEvent>(
 	url: string | URL,
-	{ event, init, flushTime = 50 }: EventSourceOptions,
+	{ event, init, flushTime = 100 }: EventSourceOptions,
 ) {
 	const timeoutRef = useRef<number | null>(null)
 	const [data, setData] = useState<Array<Event | null>>([])

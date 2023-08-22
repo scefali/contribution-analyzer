@@ -29,9 +29,9 @@ export async function* generateSummaryForPrs({
 		// and clear the buffer
 		const possiblePrompt = `
 		Below is a list of titles and bodies of a PR which ${name} has done in the past week.
-		 Create a summary below in the form of a single list only using the data given. ${customPrompt}: 
+		 Create a summary below in the form of a list using - with nothing outside the list. Do not say summary at the top. ${customPrompt}: 
 		 ${textBuffer.join('')}`
-		if (possiblePrompt.length > 3000 || prs.length === 0) {
+		if (possiblePrompt.length > 5000 || prs.length === 0) {
 			textBuffer = []
 			const generator = createSimpleCompletion(possiblePrompt, userId)
 			while (true) {

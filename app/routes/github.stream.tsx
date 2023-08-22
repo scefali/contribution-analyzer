@@ -72,7 +72,7 @@ export async function loader({ request }: DataFunctionArgs) {
 						send({
 							event: 'githubData',
 							data: JSON.stringify({
-								value: buffer.join(''),
+								value: buffer.join('').trim(),
 								action: 'data',
 								index: count,
 							}),
