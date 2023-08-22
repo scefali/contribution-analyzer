@@ -1,74 +1,74 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
- 
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
- 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
- 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
- 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
- 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
- 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
- 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
- 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
- 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
- 
-    --ring: 215 20.2% 65.1%;
- 
+    --background: 0, 0%, 0%; /* Black */
+    --foreground: 0, 0%, 100%; /* White */
+
+    --muted: 0, 0%, 20%; /* Dark gray */
+    --muted-foreground: 0, 0%, 80%; /* Light gray */
+
+    --popover: 0, 0%, 10%; /* Slightly darker than background */
+    --popover-foreground: 0, 0%, 90%; /* Slightly lighter than foreground */
+
+    --card: 0, 0%, 15%; /* Slightly darker than background for distinction */
+    --card-foreground: 0, 0%, 85%; /* Slightly lighter than foreground */
+
+    --border: 0, 0%, 25%; /* Visible against black */
+    --input: 0, 0%, 25%; /* Same as border */
+
+    --primary: 0, 0%, 60%; /* Mid gray */
+    --primary-foreground: 0, 0%, 40%; /* Dark gray */
+
+    --secondary: 0, 0%, 30%; /* Darker gray */
+    --secondary-foreground: 0, 0%, 70%; /* Light gray */
+
+    --accent: 0, 0%, 50%; /* Mid-dark gray */
+    --accent-foreground: 0, 0%, 50%; /* Same as accent for a neutral accent look */
+
+    --destructive: 0, 60%, 50%; /* A shade of red for destructive actions */
+    --destructive-foreground: 0, 0%, 100%; /* White for visibility on red */
+
+    --ring: 0, 0%, 40%; /* Dark gray ring */
+
     --radius: 0.5rem;
   }
- 
+
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
- 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
- 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
- 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
- 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
- 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
- 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
- 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
- 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 85.7% 97.3%;
- 
-    --ring: 217.2 32.6% 17.5%;
+    /* I'm using a similar color palette for dark mode but slightly different shades 
+       for distinction. Adjust if you want a more drastic difference. */
+    --background: 0, 0%, 5%; /* Near-black */
+    --foreground: 0, 0%, 95%; /* Near-white */
+
+    --muted: 0, 0%, 15%; 
+    --muted-foreground: 0, 0%, 85%; 
+
+    --popover: 0, 0%, 8%; 
+    --popover-foreground: 0, 0%, 92%; 
+
+    --card: 0, 0%, 12%; 
+    --card-foreground: 0, 0%, 88%; 
+
+    --border: 0, 0%, 20%; 
+    --input: 0, 0%, 20%; 
+
+    --primary: 0, 0%, 55%; 
+    --primary-foreground: 0, 0%, 45%; 
+
+    --secondary: 0, 0%, 25%; 
+    --secondary-foreground: 0, 0%, 75%; 
+
+    --accent: 0, 0%, 45%; 
+    --accent-foreground: 0, 0%, 55%; 
+
+    --destructive: 0, 60%, 45%; 
+    --destructive-foreground: 0, 0%, 100%; 
+
+    --ring: 0, 0%, 35%; 
   }
-}
- 
-@layer base {
+
   * {
     @apply border-border;
   }

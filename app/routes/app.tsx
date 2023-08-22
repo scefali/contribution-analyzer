@@ -3,7 +3,7 @@ import Sidebar from '~/components/sidebar.tsx'
 
 export default function App() {
 	return (
-		<div>
+		<div className='flex'>
 			<Sidebar />
 			<Outlet />
 		</div>

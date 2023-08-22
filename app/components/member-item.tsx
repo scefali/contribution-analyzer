@@ -10,7 +10,7 @@ interface Props {
 export default function MemberItem({ teamMember }: Props) {
 	const fetcher = useFetcher()
 	return (
-		<div className="grid" style={{ gridTemplateColumns: '60px 250px 20px' }}>
+	<div className="grid border-b-2 items-center p-4" style={{ gridTemplateColumns: '60px 1fr 20px', width: "100%" }}>
 			{teamMember.avatarUrl && (
 				<img
 					src={teamMember.avatarUrl}
@@ -18,8 +18,8 @@ export default function MemberItem({ teamMember }: Props) {
 					className="w-12 h-12 rounded-full"
 				/>
 			)}
-			<span className="my-auto">{teamMember.name}</span>
-			<div className="my-auto">
+			<span>{teamMember.name}</span>
+			<div>
 				<fetcher.Form action={`/app/team/${teamMember.id}`} method="DELETE">
 					<button type="submit">
 						<FaTrash />

@@ -121,6 +121,7 @@ export default function Team() {
 						type="submit"
 						className="mt-4"
 						disabled={navigation.state === 'submitting'}
+						variant="white"
 					>
 						{navigation.state === 'submitting' && (
 							<Loader2 className="animate-spin" />
@@ -136,6 +137,7 @@ export default function Team() {
 						type="submit"
 						className="mt-4"
 						disabled={fetcher.state === 'submitting'}
+						variant="white"
 					>
 						{fetcher.state === 'submitting' && (
 							<Loader2 className="animate-spin" />
@@ -146,15 +148,12 @@ export default function Team() {
 						Emails you the weekly report for all team members.
 					</div>
 				</fetcher.Form>
-				<div className="mt-8">
-					<h2 className="text-lg font-bold">Team Members:</h2>
-					<ul className="mt-4 space-y-4">
-						{teamMembers.map((teamMember, index) => (
-							<li key={index} className="flex items-center">
-								<MemberItem teamMember={teamMember} />
-							</li>
-						))}
-					</ul>
+				<br />
+				<h2 className="text-lg font-bold">Team Members:</h2>
+				<div className="mt-8 border-t-2 border-x-2">
+					{teamMembers.map((teamMember, index) => (
+						<MemberItem key={index} teamMember={teamMember} />
+					))}
 				</div>
 			</div>
 		</div>

@@ -38,18 +38,24 @@ export function useBufferedEventSource<Event extends BaseEvent>(
 		setBufferedData([])
 
 		function handler(incomingEvent: MessageEvent) {
-			const data = JSON.parse(incomingEvent.data) as Event
-			console.log('data', data)
-			setBufferedData(bufferedData => [...(bufferedData ?? []), data as Event])
-			if (data.action === 'stop') {
-				console.log('stop')
-				setHasStopped(true)
-				if (timeoutRef.current) {
-					clearTimeout(timeoutRef.current)
-					timeoutRef.current = null
+			try {
+				const data = JSON.parse(incomingEvent.data) as Event
+				setBufferedData(bufferedData => [
+					...(bufferedData ?? []),
+					data as Event,
+				])
+				if (data.action === 'stop') {
+					console.log('stop')
+					setHasStopped(true)
+					if (timeoutRef.current) {
+						clearTimeout(timeoutRef.current)
+						timeoutRef.current = null
+					}
+					eventSource.removeEventListener(event, handler)
+					eventSource.close()
 				}
-				eventSource.removeEventListener(event, handler)
-				eventSource.close()
+			} catch (error) {
+				console.error('error', error)
 			}
 		}
 		return () => {

@@ -20,6 +20,7 @@ export async function loader({ request }: DataFunctionArgs) {
 
 	
 	const redirectUri = `https://${urlObj.host}/github/oauth/callback`
+	console.log({redirectUri})
 	const githubUrl = new URL('https://github.com/login/oauth/authorize')
 	// TODO: use oktokit to generate this url
 	githubUrl.searchParams.set('client_id', process.env.GITHUB_CLIENT_ID || '')

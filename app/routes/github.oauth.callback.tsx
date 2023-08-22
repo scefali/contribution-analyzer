@@ -17,6 +17,13 @@ export async function loader({ request }: DataFunctionArgs) {
 		code,
 	})
 
+	try {
+		const tables = await prisma.$executeRaw`SELECT name FROM sqlite_master WHERE type='table';`;
+		console.log("Tables in the database:", tables);
+} catch (error) {
+		console.error("Error fetching tables:", error);
+}
+
 	const { data } = await getMyUser({ githubCookie: token })
 	const baseParams = {
 		name: data.name,
