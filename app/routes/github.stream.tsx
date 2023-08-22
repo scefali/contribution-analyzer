@@ -96,7 +96,7 @@ export async function loader({ request }: DataFunctionArgs) {
 				console.log('post quit')
 			})
 			.catch(err => {
-				console.log(err)
+				console.log('got error', err)
 				send({
 					event: 'githubData',
 					data: JSON.stringify({
