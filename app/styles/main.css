@@ -1,3 +1,10 @@
 a.active {
   text-decoration: underline;
 }
+
+.markdown-content a {
+    color: #3B82F6;
+}
+.markdown-content a:hover {
+    color: darkblue; 
+}

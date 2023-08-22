@@ -1,4 +1,5 @@
 import { useNavigation } from '@remix-run/react'
+import ReactMarkdown from 'react-markdown'
 import { useEffect, useState } from 'react'
 import { useBufferedEventSource } from '~/utils/use-buffered-event-source.ts'
 
@@ -64,7 +65,8 @@ function GithubContributionSummary({ userName, timePeriod }: Props) {
 		if (!text) {
 			return <p className="text-left">Loading...</p>
 		}
-		return <p className="text-left">{text}</p>
+		return <ReactMarkdown className="text-left markdown-content">
+			{text}</ReactMarkdown>
 	}
 	return (
 		<div className="flex flex-col items-center p-4">

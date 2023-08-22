@@ -135,5 +135,9 @@ module.exports = {
 			'150': '600px',
 		},
 	},
-	plugins: [require('tailwindcss-animate'), tailwindcssRadix],
+	plugins: [
+		require('tailwindcss-animate'),
+		tailwindcssRadix,
+		require('@tailwindcss/typography'),
+	],
 } satisfies Config

@@ -1,4 +1,3 @@
-import { text } from 'stream/consumers'
 import { createSimpleCompletion } from './chatGPT.ts'
 import type { PullRequest } from './github.ts'
 
