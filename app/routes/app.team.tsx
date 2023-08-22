@@ -149,8 +149,11 @@ export default function Team() {
 					</div>
 				</fetcher.Form>
 				<br />
-				<h2 className="text-lg font-bold">Team Members:</h2>
-				<div className="mt-8 border-t-2 border-x-2">
+				<div className="flex justify-between bg-secondary rounded-sm rounded-b-none p-2">
+					<div>Member</div>
+					<div>Actions</div>
+				</div>
+				<div className="border-x-2 border-t-2">
 					{teamMembers.map((teamMember, index) => (
 						<MemberItem key={index} teamMember={teamMember} />
 					))}
