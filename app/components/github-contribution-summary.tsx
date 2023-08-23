@@ -62,7 +62,7 @@ function GithubContributionSummary({ userName, timePeriod }: Props) {
 	}, [navigation.state])
 
 	const renderText = () => {
-		if (!text) {
+		if (!text && !error) {
 			return <p className="text-left">Loading...</p>
 		}
 		return <ReactMarkdown className="text-left markdown-content">
