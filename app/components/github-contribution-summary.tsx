@@ -65,11 +65,12 @@ function GithubContributionSummary({ userName, timePeriod }: Props) {
 		if (!text && !error) {
 			return <p className="text-left">Loading...</p>
 		}
+		// clean up the text
 		return <ReactMarkdown className="text-left markdown-content">
-			{text}</ReactMarkdown>
+			{'-' + text.trim().replaceAll(/\r*\n+-*/g, "\n--")}</ReactMarkdown>
 	}
 	return (
-		<div className="flex flex-col items-center p-4">
+		<div className="flex flex-col text-left pt-4">
 			{error && <p className="text-red-500">{error}</p>}
 			<div className="mt-4 whitespace-pre-wrap">{renderText()}</div>
 		</div>

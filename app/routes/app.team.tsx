@@ -101,7 +101,7 @@ export default function Team() {
 	const navigation = useNavigation()
 	const actionData = useActionData<ActionData>()
 	return (
-		<div className="flex flex-col items-center p-4">
+		<div className="flex flex-col items-center p-4 min-w-full">
 			<div className="w-150">
 				<Form
 					className="m-auto rounded-sm bg-secondary p-8"

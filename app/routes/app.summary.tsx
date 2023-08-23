@@ -72,7 +72,7 @@ export default function Summary() {
 	const submitting = navigation.state === 'submitting'
 	const disableButton =  submitting
 	return (
-		<div className="flex flex-col items-center p-4">
+		<div className="flex flex-col items-center p-4 min-w-full">
 			<div className="w-150">
 				<Form
 					className="m-auto rounded-sm bg-secondary p-8 "

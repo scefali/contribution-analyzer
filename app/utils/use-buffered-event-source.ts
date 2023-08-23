@@ -32,7 +32,10 @@ export function useBufferedEventSource<Event extends BaseEvent>(
 	useEffect(() => {
 		const eventSource = new EventSource(url, init)
 		eventSource.addEventListener(event, handler)
-		console.log('add event listener', event)
+		eventSource.onerror = function (event) {
+			console.error('EventSource failed:', event)
+			// Implement retry logic here, if desired.
+		}
 
 		// reset data if dependencies change
 		setBufferedData([])

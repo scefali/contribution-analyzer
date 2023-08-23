@@ -1,9 +1,9 @@
 import { type DataFunctionArgs, json } from '@remix-run/node'
-import { eventStream } from 'remix-utils'
 
 import { generateSummary, getUser } from '~/utils/github.ts'
 import { getSession } from '~/utils/session.server.ts'
 import { TimePeriod } from '~/utils/github.ts'
+import { eventStream } from '~/utils/event-stream.ts'
 
 const BUFFER_SIZE = 1
 
@@ -52,8 +52,9 @@ export async function loader({ request }: DataFunctionArgs) {
 	} = await getUser({ userName, githubCookie })
 	const name2Use = name || userName
 
-	return eventStream(request.signal, function setup(send) {
+	return eventStream(request.signal, function setup(send, close) {
 		let quit = false
+
 		generateSummary({
 			userName,
 			name: name2Use,
@@ -79,13 +80,15 @@ export async function loader({ request }: DataFunctionArgs) {
 						})
 						// quit if we are done
 						if (newItem.done) {
+							// send empty data when we are done
 							send({
 								event: 'githubData',
 								data: JSON.stringify({
 									action: 'stop',
+									index: count + 1,
 								}),
 							})
-							console.log('done')
+							quit = true
 							return
 						}
 						// otherwise empty the buffer
@@ -94,6 +97,7 @@ export async function loader({ request }: DataFunctionArgs) {
 					}
 				}
 				console.log('post quit')
+				close()
 			})
 			.catch(err => {
 				console.log('got error', err)
@@ -104,6 +108,7 @@ export async function loader({ request }: DataFunctionArgs) {
 						message: err.message,
 					}),
 				})
+				close()
 			})
 		return () => {
 			quit = true
