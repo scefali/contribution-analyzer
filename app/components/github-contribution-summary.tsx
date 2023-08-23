@@ -2,6 +2,7 @@ import { useNavigation } from '@remix-run/react'
 import ReactMarkdown from 'react-markdown'
 import { useEffect, useState } from 'react'
 import { useBufferedEventSource } from '~/utils/use-buffered-event-source.ts'
+import { DUMMY_SEND_DATA } from '~/utils/constants'
 
 interface Props {
 	userName: string
@@ -66,11 +67,18 @@ function GithubContributionSummary({ userName, timePeriod }: Props) {
 			return <p className="text-left">Loading...</p>
 		}
 		// clean up the text
-		return <ReactMarkdown className="text-left markdown-content">
-			{'-' + text.trim().replaceAll(/\r*\n+-*/g, "\n--")}</ReactMarkdown>
+		return (
+			<ReactMarkdown className="markdown-content text-left">
+				{'-' +
+					text
+						.trim()
+						.replaceAll(DUMMY_SEND_DATA, '')
+						.replaceAll(/\r*\n+-*/g, '\n--')}
+			</ReactMarkdown>
+		)
 	}
 	return (
-		<div className="flex flex-col text-left pt-4">
+		<div className="flex flex-col pt-4 text-left">
 			{error && <p className="text-red-500">{error}</p>}
 			<div className="mt-4 whitespace-pre-wrap">{renderText()}</div>
 		</div>
