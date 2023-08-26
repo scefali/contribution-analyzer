@@ -75,6 +75,11 @@ export const getPrsForSummary = async ({
 	return prs
 }
 
+function* yieldResult(result: string) {
+  yield result;
+}
+
+
 export const generateSummary = async ({
 	userId,
 	userName,
@@ -93,6 +98,10 @@ export const generateSummary = async ({
 	const prs = await getPrsForSummary({ userName, githubCookie, timePeriod })
 
 	console.group("considering", prs.length, "prs")
+	// if there are no prs, then we can't generate a summary
+	if (prs.length === 0) {
+		return yieldResult(`No PRs found for ${name} in the past ${timePeriod}`)
+	}
 
 	return generateSummaryForPrs({ prs, name, customPrompt, userId })
 }
