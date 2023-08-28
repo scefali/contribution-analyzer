@@ -102,7 +102,7 @@ export default function Team() {
 	const actionData = useActionData<ActionData>()
 	return (
 		<div className="flex flex-col items-center p-4 min-w-full">
-			<div className="w-150">
+			<div className="md:w-150">
 				<Form
 					className="m-auto rounded-sm bg-secondary p-8"
 					// eslint-disable-next-line remix-react-routes/require-valid-paths

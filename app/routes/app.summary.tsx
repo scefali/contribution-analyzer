@@ -6,11 +6,7 @@ import {
 } from '@remix-run/node'
 import { Loader2 } from 'lucide-react'
 
-import {
-	Form,
-	useNavigation,
-	useSearchParams,
-} from '@remix-run/react'
+import { Form, useNavigation, useSearchParams } from '@remix-run/react'
 
 import { getMyUser } from '~/utils/github.ts'
 import { getSession, destroySession } from '~/utils/session.server.ts'
@@ -24,6 +20,7 @@ import {
 	SelectValue,
 } from '~/@/components/ui/select.tsx'
 import GithubContributionSummary from '~/components/github-contribution-summary.tsx'
+import AppLayout from '~/components/app-layout'
 
 type ActionData =
 	| { status: 'error'; message: string }
@@ -70,53 +67,51 @@ export default function Summary() {
 	const timePeriod = queryParams.get('timePeriod')
 	const navigation = useNavigation()
 	const submitting = navigation.state === 'submitting'
-	const disableButton =  submitting
+	const disableButton = submitting
 	return (
-		<div className="flex flex-col items-center p-4 min-w-full">
-			<div className="w-150">
-				<Form
-					className="m-auto rounded-sm bg-secondary p-8 "
-					action="/app/summary"
-					method="GET"
+		<AppLayout>
+			<Form
+				className="m-auto rounded-sm bg-secondary p-8 "
+				action="/app/summary"
+				method="GET"
+			>
+				<h1 className="text-lg font-bold">
+					See a Summary of Github Contributions
+				</h1>
+				<Input
+					type="text"
+					placeholder="GitHub Username"
+					name="userName"
+					className="mt-4 max-w-md"
+					required
+					defaultValue={queryParams.get('userName') || ''}
+				/>
+				<Select
+					name="timePeriod"
+					defaultValue={queryParams.get('timePeriod') || ''}
+					required
 				>
-					<h1 className="text-lg font-bold">
-						See a Summary of Github Contributions
-					</h1>
-					<Input
-						type="text"
-						placeholder="GitHub Username"
-						name="userName"
-						className="mt-4 max-w-md"
-						required
-						defaultValue={queryParams.get('userName') || ''}
+					<SelectTrigger className="mt-4 w-[180px] bg-background ">
+						<SelectValue placeholder="Time Period" />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="1w">1 Week</SelectItem>
+						<SelectItem value="1m">1 Month</SelectItem>
+						<SelectItem value="3m">3 Months</SelectItem>
+						<SelectItem value="1y">1 Year</SelectItem>
+					</SelectContent>
+				</Select>
+				<Button type="submit" className="mt-4" disabled={disableButton}>
+					{submitting && <Loader2 className="animate-spin" />}
+					Submit
+				</Button>
+				{userName && timePeriod && (
+					<GithubContributionSummary
+						userName={userName}
+						timePeriod={timePeriod}
 					/>
-					<Select
-						name="timePeriod"
-						defaultValue={queryParams.get('timePeriod') || ''}
-						required
-					>
-						<SelectTrigger className="mt-4 w-[180px] bg-background ">
-							<SelectValue placeholder="Time Period" />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectItem value="1w">1 Week</SelectItem>
-							<SelectItem value="1m">1 Month</SelectItem>
-							<SelectItem value="3m">3 Months</SelectItem>
-							<SelectItem value="1y">1 Year</SelectItem>
-						</SelectContent>
-					</Select>
-					<Button type="submit" className="mt-4" disabled={disableButton}>
-						{submitting && <Loader2 className="animate-spin" />}
-						Submit
-					</Button>
-					{userName && timePeriod && (
-						<GithubContributionSummary
-							userName={userName}
-							timePeriod={timePeriod}
-						/>
-					)}
-				</Form>
-			</div>
-		</div>
+				)}
+			</Form>
+		</AppLayout>
 	)
 }
