@@ -1,3 +1,3 @@
 
 
-export const DUMMY_SEND_DATA = "___DUMMY_SEND_DATA__"
+export const DUMMY_SEND_DATA = "__DUMMY_SEND_DATA__"
