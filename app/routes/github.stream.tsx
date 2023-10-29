@@ -1,10 +1,9 @@
-import { type DataFunctionArgs, json } from '@remix-run/node'
+import { type DataFunctionArgs } from '@remix-run/node'
 
 import { generateSummary, getUser } from '~/utils/github.ts'
 import { getSession } from '~/utils/session.server.ts'
 import { TimePeriod } from '~/utils/github.ts'
 import { eventStream } from '~/utils/event-stream.ts'
-import { DUMMY_SEND_DATA } from '~/utils/constants'
 
 const BUFFER_SIZE = 1
 
@@ -75,16 +74,6 @@ export async function loader({ request }: DataFunctionArgs) {
 							event: 'githubData',
 							data: JSON.stringify({
 								value: buffer.join(''),
-								action: 'data',
-								index: count,
-							}),
-						})
-						// for some reason, we need to send another event 
-						// for the client to pick it up. We remove it in the UI
-						send({
-							event: 'githubData',
-							data: JSON.stringify({
-								value: DUMMY_SEND_DATA,
 								action: 'data',
 								index: count,
 							}),

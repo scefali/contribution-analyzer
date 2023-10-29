@@ -2,7 +2,6 @@ import { useNavigation } from '@remix-run/react'
 import ReactMarkdown from 'react-markdown'
 import { useEffect, useState } from 'react'
 import { useBufferedEventSource } from '~/utils/use-buffered-event-source.ts'
-import { DUMMY_SEND_DATA } from '~/utils/constants'
 
 interface Props {
 	userName: string
@@ -41,7 +40,7 @@ function GithubContributionSummary({ userName, timePeriod }: Props) {
 			if (stream.action !== 'data') return ''
 			return stream.value
 		})
-		setText((prevText: string) => prevText + dataStreamsText.join(''))
+		setText(dataStreamsText.join(''))
 	}, [streamArray])
 
 	const [error, setError] = useState<string | null>(null)
@@ -69,11 +68,7 @@ function GithubContributionSummary({ userName, timePeriod }: Props) {
 		// clean up the text
 		return (
 			<ReactMarkdown className="markdown-content text-left">
-				{'-' +
-					text
-						.trim()
-						.replaceAll(DUMMY_SEND_DATA, '')
-						.replaceAll(/\r*\n+-*/g, '\n--')}
+				{text.trim()}
 			</ReactMarkdown>
 		)
 	}

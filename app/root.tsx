@@ -114,7 +114,7 @@ function App() {
 				<Links />
 			</head>
 			<body className="flex h-full flex-col justify-between bg-background text-foreground">
-				<div className="flex-1">
+				<div className="flex-1 overflow-y-auto">
 					<Outlet />
 				</div>
 				<div className="h-5" />

@@ -16,7 +16,7 @@ export default function App() {
 			<div className="z-50 sm:items-start	md:items-center ">
 				<Sidebar />
 			</div>
-			<div className="fixed min-w-full mt-6 md:mt-0">
+			<div className="min-w-full mt-6 md:mt-0">
 				<Outlet />
 			</div>
 		</div>

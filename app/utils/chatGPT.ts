@@ -1,5 +1,5 @@
 /// `ChatGPT.tsx` from https://github.com/openai/openai-node/issues/18
-import { type CreateCompletionResponse, Configuration, OpenAIApi } from 'openai'
+import OpenAI from 'openai'
 import { type IncomingMessage } from 'http'
 import { setCache, getCache } from '~/utils/redis.ts'
 import { LLMRateLimitError } from './errors'
@@ -11,10 +11,9 @@ interface RateLimitCount {
 	count: number
 }
 
-const configuration = new Configuration({
+const openai = new OpenAI({
 	apiKey: process.env.OPENAI_API_KEY,
 })
-const OpenAI = new OpenAIApi(configuration)
 
 async function* chunksToLines(
 	chunksAsync: IncomingMessage,
@@ -51,49 +50,31 @@ async function* linesToMessages(
 	}
 }
 
-async function* streamCompletion(
-	data: IncomingMessage,
-): AsyncGenerator<string> {
-	yield* linesToMessages(chunksToLines(data))
-}
-
 export async function* createSimpleCompletionNoCache(prompt: string) {
-	const completion = await OpenAI.createCompletion(
-		{
-			model: 'text-davinci-003',
-			prompt,
-			max_tokens: 1000,
-			stream: true,
-		},
-		{
-			responseType: 'stream',
-		},
-	)
-
-	try {
-		// convert to the openai response type
-
-		for await (const message of streamCompletion(
-			completion.data as unknown as IncomingMessage,
-		)) {
-			const parsed = JSON.parse(message) as CreateCompletionResponse
-			const { text } = parsed.choices[0]
-			if (typeof text === 'string') {
-				yield text
-			}
-		}
-	} catch (error) {
-		console.error('Could not stream completion', error)
+	const stream = await openai.chat.completions.create({
+		model: 'gpt-3.5-turbo',
+		messages: [{ role: 'user', content: prompt }],
+		stream: true,
+	})
+	for await (const part of stream) {
+		const delta = part.choices[0]?.delta?.content || ''
+		yield delta
 	}
 }
 
 export async function* createSimpleCompletion(prompt: string, userId: number) {
 	// If the result is cached, we don't have to rate limit
-	const cached = await getCache(prompt)
-	if (cached) {
-		console.log('cached')
-		yield cached
-		return
+	let useCache: boolean = false
+	try {
+		const cached = await getCache(prompt)
+		useCache = true
+		if (cached) {
+			yield cached
+			return
+		}
+	} catch (err) {
+		console.error('Could not get cache', err)
+		useCache = false
 	}
 
 	// Increment and check rate limit
@@ -101,7 +82,10 @@ export async function* createSimpleCompletion(prompt: string, userId: number) {
 	const startOfDay = new Date().setHours(0, 0, 0, 0)
 	const rateLimitKey = `llm_user_rate_limit:${userId}`
 
-	const rateLimitCountJson = await getCache(rateLimitKey)
+	// if cache doesn't work, just let it through
+	const rateLimitCountJson = useCache
+		? await getCache(rateLimitKey)
+		: JSON.stringify({ timestamp: 0, count: 0 })
 	console.log('rateLimitCountJson', rateLimitCountJson, rateLimitKey)
 
 	// parse the rate limit count from cache
@@ -130,28 +114,31 @@ export async function* createSimpleCompletion(prompt: string, userId: number) {
 		yield message
 	}
 
-	await setCache(prompt, output.join(''))
+	try {
+		await setCache(prompt, output.join(''))
 
-	// Update rate limit count
-	console.log('teimestamp', rateLimitCount.timestamp)
-	if (rateLimitCount.timestamp < startOfDay) {
-		// Reset count for a new day
-		console.log(
-			'new count at timestamp',
-			currentTimestamp,
-			JSON.stringify({ timestamp: currentTimestamp, count: 1 }),
-		)
-		await setCache(
-			rateLimitKey,
-			JSON.stringify({ timestamp: currentTimestamp, count: 1 }),
-		)
-	} else {
-		// Increment count for the day
-		const count = rateLimitCount.count + 1
-		console.log('count', count)
-		await setCache(
-			rateLimitKey,
-			JSON.stringify({ timestamp: currentTimestamp, count }),
-		)
+		// Update rate limit count
+		if (rateLimitCount.timestamp < startOfDay) {
+			// Reset count for a new day
+			console.log(
+				'new count at timestamp',
+				currentTimestamp,
+				JSON.stringify({ timestamp: currentTimestamp, count: 1 }),
+			)
+			await setCache(
+				rateLimitKey,
+				JSON.stringify({ timestamp: currentTimestamp, count: 1 }),
+			)
+		} else {
+			// Increment count for the day
+			const count = rateLimitCount.count + 1
+			console.log('count', count)
+			await setCache(
+				rateLimitKey,
+				JSON.stringify({ timestamp: currentTimestamp, count }),
+			)
+		}
+	} catch (err) {
+		console.error('Could not set cache', err)
 	}
 }

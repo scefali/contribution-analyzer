@@ -1,6 +1,9 @@
 import { Redis } from 'ioredis'
 
-const client = new Redis(process.env.UPSTASH_REDIS_CONNECTION_STRING as string)
+const client = new Redis(process.env.REDIS_CONNECTION_STRING as string)
+client.on('error', function (e) {
+	console.log('Redis error: ' + e)
+})
 
 export const setCache = async (
 	key: string,

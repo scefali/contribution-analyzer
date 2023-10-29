@@ -26,30 +26,25 @@ export function useBufferedEventSource<Event extends BaseEvent>(
 ) {
 	const timeoutRef = useRef<number | null>(null)
 	const [data, setData] = useState<Array<Event | null>>([])
-	const [bufferedData, setBufferedData] = useState<Array<Event | null>>([])
-	const [hasStopped, setHasStopped] = useState(false)
 
 	useEffect(() => {
 		const eventSource = new EventSource(url, init)
 		eventSource.addEventListener(event, handler)
-		eventSource.onerror = function (event) {
-			console.error('EventSource failed:', event)
-			// Implement retry logic here, if desired.
+		eventSource.onerror = function (errorEvent) {
+			console.error('EventSource failed:',errorEvent)
+			// close connection
+			eventSource.removeEventListener(event, handler)
+			eventSource.close()
 		}
 
 		// reset data if dependencies change
-		setBufferedData([])
+		setData([])
 
 		function handler(incomingEvent: MessageEvent) {
 			try {
 				const data = JSON.parse(incomingEvent.data) as Event
-				setBufferedData(bufferedData => [
-					...(bufferedData ?? []),
-					data as Event,
-				])
+				setData(oldData => [...oldData, data as Event])
 				if (data.action === 'stop') {
-					console.log('stop')
-					setHasStopped(true)
 					if (timeoutRef.current) {
 						clearTimeout(timeoutRef.current)
 						timeoutRef.current = null
@@ -66,15 +61,6 @@ export function useBufferedEventSource<Event extends BaseEvent>(
 			eventSource.close()
 		}
 	}, [url, event, init])
-
-	useEffect(() => {
-		timeoutRef.current = window.setTimeout(() => {
-			setData(bufferedData)
-			setBufferedData([])
-		}, flushTime)
-		return () =>
-			timeoutRef.current ? window.clearTimeout(timeoutRef.current) : undefined
-	}, [flushTime, bufferedData, hasStopped])
 
 	return data
 }
