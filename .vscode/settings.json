@@ -3,5 +3,7 @@
     "@remix-run/server-runtime",
     "@remix-run/router",
     "react-router"
-  ]
+  ],
+  "editor.tabSize": 2,
+  "editor.insertSpaces": false
 }

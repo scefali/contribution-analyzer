@@ -15,44 +15,9 @@ const openai = new OpenAI({
 	apiKey: process.env.OPENAI_API_KEY,
 })
 
-async function* chunksToLines(
-	chunksAsync: IncomingMessage,
-): AsyncGenerator<string> {
-	let previous = ''
-
-	for await (const chunk of chunksAsync) {
-		const bufferChunk = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)
-
-		previous += bufferChunk
-
-		let eolIndex
-
-		while ((eolIndex = previous.indexOf('\n')) >= 0) {
-			// line includes the EOL
-			const line = previous.slice(0, eolIndex + 1).trimEnd()
-
-			if (line === 'data: [DONE]') break
-
-			if (line.startsWith('data: ')) yield line
-
-			previous = previous.slice(eolIndex + 1)
-		}
-	}
-}
-
-async function* linesToMessages(
-	linesAsync: AsyncGenerator<string>,
-): AsyncGenerator<string> {
-	for await (const line of linesAsync) {
-		const message = line.substring('data :'.length)
-
-		yield message
-	}
-}
-
 export async function* createSimpleCompletionNoCache(prompt: string) {
 	const stream = await openai.chat.completions.create({
-		model: 'gpt-3.5-turbo',
+		model: 'gpt-4-1106-preview',
 		messages: [{ role: 'user', content: prompt }],
 		stream: true,
 	})

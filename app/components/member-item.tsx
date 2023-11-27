@@ -10,7 +10,10 @@ interface Props {
 export default function MemberItem({ teamMember }: Props) {
 	const fetcher = useFetcher()
 	return (
-	<div className="grid border-b-2 items-center p-4" style={{ gridTemplateColumns: '60px 1fr 20px', width: "100%" }}>
+		<div
+			className="grid items-center border-b-2 p-4"
+			style={{ gridTemplateColumns: '60px 1fr 20px', width: '100%' }}
+		>
 			{teamMember.avatarUrl && (
 				<img
 					src={teamMember.avatarUrl}

@@ -1,7 +1,18 @@
 export default function AppLayout({ children }: { children: React.ReactNode }) {
 	return (
-		<div className="flex min-w-full flex-col items-center p-4">
-			<div className="md:w-150">{children}</div>
+		<div
+			id="app-layout"
+			className="flex w-full flex-row justify-between p-4"
+		>
+			<div
+				style={{
+					width: '100%',
+				}}
+				className="box-border"
+			>
+				{children}
+			</div>
+			<div />
 		</div>
 	)
 }

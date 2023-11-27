@@ -2,15 +2,10 @@ import {
 	type DataFunctionArgs,
 	type TypedResponse,
 	json,
-	redirect,
 } from '@remix-run/node'
 
 import { sendEmail } from '~/utils/email.server.ts'
-import {
-	TimePeriod,
-	generateSummary,
-	getPrsForSummary,
-} from '~/utils/github.ts'
+import { TimePeriod, generateSummary } from '~/utils/github.ts'
 
 import TeamSummary from '~/components/emails/team-summary.tsx'
 import { getSession } from '~/utils/session.server.ts'

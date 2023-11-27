@@ -12,11 +12,11 @@ export function loader({ request }: { request: Request }) {
 
 export default function App() {
 	return (
-		<div className="flex min-w-full">
+		<div className="flex flex-col md:flex-row">
 			<div className="z-50 sm:items-start	md:items-center ">
 				<Sidebar />
 			</div>
-			<div className="min-w-full mt-6 md:mt-0">
+			<div className="mt-6 md:mt-0" style={{ width: '100%' }}>
 				<Outlet />
 			</div>
 		</div>

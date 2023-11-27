@@ -40,7 +40,6 @@ export function eventStream(
       function send({ event = "message", data }: SendFunctionArgs) {
         controller.enqueue(encoder.encode(`event: ${event}\n`));
         controller.enqueue(encoder.encode(`data: ${data}\n\n`));
-        console.log('send data')
       }
 
       let cleanup = init(send, close);

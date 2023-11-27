@@ -5,7 +5,7 @@ import {
 	redirect,
 } from '@remix-run/node'
 import { Loader2 } from 'lucide-react'
-import { Suspense, useEffect, useState } from 'react'
+import { Fragment, Suspense, useEffect, useState } from 'react'
 
 import {
 	Await,
@@ -19,11 +19,10 @@ import {
 import { Prisma } from '@prisma/client'
 import { RequestError } from 'octokit'
 
-import { getUser, getMyUser } from '~/utils/github.ts'
+import { getUser } from '~/utils/github.ts'
 import { getSession } from '~/utils/session.server.ts'
 import { Input } from '~/@/components/ui/input.tsx'
 import { Button } from '~/@/components/ui/button.tsx'
-import { destroySession } from '~/utils/session.server.ts'
 import { prisma } from '~/utils/db.server.ts'
 import MemberItem from '~/components/member-item.tsx'
 import AppLayout from '~/components/app-layout'
@@ -98,7 +97,7 @@ export async function loader({ request }: DataFunctionArgs) {
 
 export default function Team() {
 	const { teamMembers } = useLoaderData<ReturnType<typeof loader>>()
-	const fetcher = useFetcher()
+	const generateReportFetcher = useFetcher()
 	const navigation = useNavigation()
 	const actionData = useActionData<ActionData>()
 	return (
@@ -132,14 +131,17 @@ export default function Team() {
 					<div className="mt-4 text-red-500">{actionData.message}</div>
 				)}
 			</Form>
-			<fetcher.Form method="POST" action="/app/team/generate-report">
+			<generateReportFetcher.Form
+				method="POST"
+				action="/app/team/generate-report"
+			>
 				<Button
 					type="submit"
 					className="mt-4"
-					disabled={fetcher.state === 'submitting'}
+					disabled={generateReportFetcher.state === 'submitting'}
 					variant="white"
 				>
-					{fetcher.state === 'submitting' && (
+					{generateReportFetcher.state === 'submitting' && (
 						<Loader2 className="animate-spin" />
 					)}
 					Generate Weekly Report
@@ -147,17 +149,27 @@ export default function Team() {
 				<div className="mt-2">
 					Emails you the weekly report for all team members.
 				</div>
-			</fetcher.Form>
-			<br />
-			<div className="flex justify-between rounded-sm rounded-b-none bg-secondary p-2">
-				<div>Member</div>
-				<div>Actions</div>
-			</div>
-			<div className="border-x-2 border-t-2">
-				{teamMembers.map((teamMember, index) => (
-					<MemberItem key={index} teamMember={teamMember} />
-				))}
-			</div>
+			</generateReportFetcher.Form>
+			{generateReportFetcher.data &&
+				generateReportFetcher.data.status === 'error' && (
+					<div className="mt-4 text-red-500">
+						{generateReportFetcher.data.message}
+					</div>
+				)}
+			{teamMembers.length > 0 ? (
+				<Fragment>
+					<br />
+					<div className="flex justify-between rounded-sm rounded-b-none bg-secondary p-2">
+						<div>Member</div>
+						<div>Actions</div>
+					</div>
+					<div className="border-x-2 border-t-2">
+						{teamMembers.map((teamMember, index) => (
+							<MemberItem key={index} teamMember={teamMember} />
+						))}
+					</div>
+				</Fragment>
+			) : null}
 		</AppLayout>
 	)
 }

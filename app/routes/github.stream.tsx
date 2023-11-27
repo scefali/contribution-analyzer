@@ -69,7 +69,6 @@ export async function loader({ request }: DataFunctionArgs) {
 					const newItem = await generator.next()
 					buffer.push(newItem.value)
 					if (buffer.length >= BUFFER_SIZE || newItem.done) {
-						console.log('sending buffer', buffer.join(''))
 						send({
 							event: 'githubData',
 							data: JSON.stringify({
