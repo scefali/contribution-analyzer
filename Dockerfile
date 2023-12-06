@@ -70,6 +70,9 @@ COPY --from=flyio/litefs:0.4.0 /usr/local/bin/litefs /usr/local/bin/litefs
 ADD other/litefs.yml /etc/litefs.yml
 RUN mkdir -p /data ${LITEFS_DIR}
 
+RUN npx prisma migrate dev
+RUN npx prisma migrate deploy
+
 ADD . .
 
 CMD ["litefs", "mount"]
