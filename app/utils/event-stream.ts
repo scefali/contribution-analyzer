@@ -47,13 +47,12 @@ export function eventStream(
       let closed = false;
 
       function close() {
-        console.log('close')
         if (closed) return;
         cleanup();
         closed = true;
         signal.removeEventListener("abort", close);
         controller.close();
-        console.log('controller cloed')
+        console.log('controller closed')
       }
 
       signal.addEventListener("abort", close);
