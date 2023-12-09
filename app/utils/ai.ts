@@ -24,9 +24,12 @@ export async function* generateSummaryForPrs({
   // Construct the prompt for OpenAI
   const prompt = `
     Below is a list of titles and bodies of PRs which ${name} has done in the past week.
-    Create a summary below in the form of a list nothing outside the list. Do not say summary at the top.
-	Include links. ${customPrompt || ''}: 
+    Create a summary below in the form of a list nothing outside the list.
+    Each items should say what the PR does with a link at the end
+    ${customPrompt || ''}: 
     ${textBuffer.join('\n')}`
+
+  console.log({textBuffer})
 
   // Generate the summary using OpenAI
   const generator = createSimpleCompletion(prompt, userId)
