@@ -3,6 +3,7 @@ import { Outlet } from '@remix-run/react'
 import Sidebar from '~/components/sidebar.tsx'
 
 export function loader({ request }: { request: Request }) {
+	// TODO: clean up redirect
 	if (request.url === '/app') {
 		// redirect to the /app/summary route
 		return redirect('/app/summary')
