@@ -1,4 +1,4 @@
-import { intervalTrigger } from '@trigger.dev/sdk'
+import { cronTrigger } from '@trigger.dev/sdk'
 import { PrismaClient } from '@prisma/client'
 import { sendEmail } from '~/utils/email.server.ts'
 import { TimePeriod, generateSummary } from '~/utils/github.ts'
@@ -7,14 +7,13 @@ import { type User } from '~/utils/types'
 import { client } from '~/trigger.server'
 
 const prisma = new PrismaClient()
-const oneWeekInSeconds = 60 * 60 * 24 * 7 // One week in seconds
 
 console.log('weekly-report-job')
 export const job = client.defineJob({
 	id: 'weekly-report-job',
 	name: 'Weekly Report Job',
 	version: '1.0.0',
-	trigger: intervalTrigger({ seconds: oneWeekInSeconds }),
+	trigger: cronTrigger({ cron: '0 0 * * 1' }),
 	run: async (_, io) => {
 		try {
 			// Fetch all users (team members)
