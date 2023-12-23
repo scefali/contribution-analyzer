@@ -2,42 +2,51 @@ import { createSimpleCompletion } from './chatGPT.ts'
 import type { PullRequest } from './github.ts'
 
 export async function* generateSummaryForPrs({
-  name,
-  prs,
-  customPrompt,
-  userId,
+	name,
+	prs,
+	customPrompt,
+	userId,
 }: {
-  prs: PullRequest[]
-  name: string
-  customPrompt?: string
-  userId: number
+	prs: PullRequest[]
+	name: string
+	customPrompt?: string
+	userId: number
 }) {
-  let textBuffer = []
+	// Add the title, body, and link of each PR to the text buffer
+	const textBuffer = await Promise.all(
+		prs.map(async pr => {
+			console.log({ pr })
+			let text = ''
+			text += `Title: ${pr.title}`
+			text += `Body: ${pr.body}`
+			text += `Link: ${pr.html_url}`
+			if (pr?.pull_request?.diff_url) {
+				const response = await fetch(pr.pull_request.diff_url)
+				const diffText = await response.text()
+				text += `Diff: ${diffText}`
+			}
+			return text
+		}),
+	)
 
-  // Add the title, body, and link of each PR to the text buffer
-  for (const pr of prs) {
-    textBuffer.push(`Title: ${pr.title}`)
-    textBuffer.push(`Body: ${pr.body}`)
-    textBuffer.push(`Link: ${pr.html_url}`)
-  }
-
-  // Construct the prompt for OpenAI
-  const prompt = `
+	// Construct the prompt for OpenAI
+	const prompt = `
     Below is a list of titles and bodies of PRs which ${name} has done in the past week.
     Create a summary below in the form of a list nothing outside the list.
-    Each items should say what the PR does with a link at the end
+    Each items should say what the PR does with a link at the end.
+    A diff of the PR is being passed in so please also use that to generate the summary.
     ${customPrompt || ''}: 
     ${textBuffer.join('\n')}`
 
-  console.log({textBuffer})
+	console.log({ textBuffer })
 
-  // Generate the summary using OpenAI
-  const generator = createSimpleCompletion(prompt, userId)
-  while (true) {
-    const newItem = await generator.next()
-    if (newItem.done) {
-      return
-    }
-    yield newItem.value
-  }
+	// Generate the summary using OpenAI
+	const generator = createSimpleCompletion(prompt, userId)
+	while (true) {
+		const newItem = await generator.next()
+		if (newItem.done) {
+			return
+		}
+		yield newItem.value
+	}
 }

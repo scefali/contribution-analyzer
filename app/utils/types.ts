@@ -1,4 +1,4 @@
-import type { Prisma, PrismaClient } from '@prisma/client'
+import type { Prisma, PrismaClient} from '@prisma/client'
 
 export type TeamMember = Prisma.PromiseReturnType<
 	PrismaClient['teamMember']['create']

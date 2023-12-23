@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client'
 import { sendEmail } from '~/utils/email.server.ts'
 import { TimePeriod, generateSummary } from '~/utils/github.ts'
 import TeamSummary from '~/components/emails/team-summary.tsx'
-import { type User } from '~/utils/types'
+import type { User } from '@prisma/client'
 import { client } from '~/trigger.server'
 
 const prisma = new PrismaClient()
@@ -46,7 +46,6 @@ async function generateSummaryForUser(user: User) {
 				githubCookie: user.githubToken,
 				userName: member.gitHubUserName,
 				timePeriod: TimePeriod.OneWeek,
-				customPrompt: 'Include links to the PRs for each item',
 			})
 			const output = []
 			for await (const value of iterator) {
