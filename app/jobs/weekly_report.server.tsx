@@ -13,6 +13,7 @@ export const job = client.defineJob({
 	id: 'weekly-report-job',
 	name: 'Weekly Report Job',
 	version: '1.0.0',
+	// This job triggers every Monday at 00:00
 	trigger: cronTrigger({ cron: '0 0 * * 1' }),
 	run: async (_, io) => {
 		try {
