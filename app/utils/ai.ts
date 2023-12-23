@@ -15,7 +15,6 @@ export async function* generateSummaryForPrs({
 	// Add the title, body, and link of each PR to the text buffer
 	const textBuffer = await Promise.all(
 		prs.map(async pr => {
-			console.log({ pr })
 			let text = ''
 			text += `Title: ${pr.title}`
 			text += `Body: ${pr.body}`
@@ -39,7 +38,6 @@ export async function* generateSummaryForPrs({
     ${customPrompt || ''}: 
     ${textBuffer.join('\n')}`
 
-	console.log({ textBuffer })
 
 	// Generate the summary using OpenAI
 	const generator = createSimpleCompletion(prompt, userId)
