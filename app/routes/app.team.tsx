@@ -26,6 +26,7 @@ import { Button } from '~/@/components/ui/button.tsx'
 import { prisma } from '~/utils/db.server.ts'
 import MemberItem from '~/components/member-item.tsx'
 import AppLayout from '~/components/app-layout'
+import { getGithubToken } from '~/orm/user.server'
 
 type ActionData = { status: 'error'; message: string } | { status: 'success' }
 
@@ -43,11 +44,11 @@ export async function action({
 	}
 
 	const session = await getSession(request.headers.get('Cookie'))
-	const githubCookie: string = session.get('github-auth')
+	const gitHubApiToken = await getGithubToken(session.get('user-id'))
 	const userId: number = session.get('user-id')
 
 	try {
-		const { data: gitHubUser } = await getUser({ userName, githubCookie })
+		const { data: gitHubUser } = await getUser({ userName, githubCookie: gitHubApiToken })
 		await prisma.teamMember.create({
 			data: {
 				name: gitHubUser.name,

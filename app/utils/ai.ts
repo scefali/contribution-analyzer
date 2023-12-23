@@ -34,6 +34,7 @@ export async function* generateSummaryForPrs({
     Below is a list of titles and bodies of PRs which ${name} has done in the past week.
     Create a summary below in the form of a list nothing outside the list.
     Each items should say what the PR does with a link at the end in the markdown format.
+		Explain in a bit of detail what the PR is doing.
     ${customPrompt || ''}: 
     ${textBuffer.join('\n')}`
 

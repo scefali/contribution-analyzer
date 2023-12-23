@@ -11,6 +11,7 @@ import TeamSummary from '~/components/emails/team-summary.tsx'
 import { getSession } from '~/utils/session.server.ts'
 import { prisma } from '~/utils/db.server.ts'
 import { LLMRateLimitError } from '~/utils/errors'
+import { getGithubToken } from '~/orm/user.server'
 
 interface ActionData {
 	status: 'error' | 'success'
@@ -27,13 +28,14 @@ export async function action({
 			ownerId: userId,
 		},
 	})
+	const gitHubApiToken = await getGithubToken(userId)
 	try {
 		const summaryList = await Promise.all(
 			teamMembers.map(async member => {
 				const iterator = await generateSummary({
 					userId,
 					name: member.name || 'Unknown',
-					githubCookie: session.get('github-auth'),
+					githubCookie: gitHubApiToken,
 					userName: member.gitHubUserName,
 					timePeriod: TimePeriod.OneWeek,
 					customPrompt: 'Include links to the PRs for each item',

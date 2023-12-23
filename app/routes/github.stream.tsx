@@ -4,6 +4,7 @@ import { generateSummary, getUser } from '~/utils/github.ts'
 import { getSession } from '~/utils/session.server.ts'
 import { TimePeriod } from '~/utils/github.ts'
 import { eventStream } from '~/utils/event-stream.ts'
+import { getGithubToken } from '~/orm/user.server'
 
 const BUFFER_SIZE = 1
 
@@ -45,11 +46,11 @@ export async function loader({ request }: DataFunctionArgs) {
 	const timePeriod2Use = timePeriod as TimePeriod
 
 	const session = await getSession(request.headers.get('Cookie'))
-	const githubCookie = session.get('github-auth')
+	const gitHubApiToken = await getGithubToken(session.get('user-id'))
 
 	const {
 		data: { name },
-	} = await getUser({ userName, githubCookie })
+	} = await getUser({ userName, githubCookie: gitHubApiToken })
 	const name2Use = name || userName
 
 	return eventStream(request.signal, function setup(send, close) {
@@ -58,7 +59,7 @@ export async function loader({ request }: DataFunctionArgs) {
 		generateSummary({
 			userName,
 			name: name2Use,
-			githubCookie,
+			githubCookie: gitHubApiToken,
 			timePeriod: timePeriod2Use,
 			userId: session.get('user-id'),
 		})

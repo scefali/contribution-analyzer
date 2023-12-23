@@ -21,6 +21,7 @@ import {
 } from '~/@/components/ui/select.tsx'
 import GithubContributionSummary from '~/components/github-contribution-summary.tsx'
 import AppLayout from '~/components/app-layout'
+import { getGithubToken } from '~/orm/user.server'
 
 type ActionData =
 	| { status: 'error'; message: string }
@@ -43,20 +44,9 @@ export async function action({
 
 export async function loader({ request }: DataFunctionArgs) {
 	const session = await getSession(request.headers.get('Cookie'))
-	const githubCookie = session.get('github-auth')
-
-	// check if our token is still valid when the page laods
-	try {
-		// check if token still valid
-		await getMyUser({ githubCookie })
-	} catch (e) {
-		// TODO: better error handling
-		// if not, redirect to the the install page after clearing the session
-		return redirect(`/github/install`, {
-			headers: {
-				'Set-Cookie': await destroySession(session),
-			},
-		})
+	const userId = session.get('user-id')
+	if (!userId) {
+		return redirect('/github/install')
 	}
 	return null
 }

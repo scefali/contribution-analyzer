@@ -1,26 +1,23 @@
-import React, { useState } from 'react'
-import { App } from 'octokit'
+import { useLoaderData } from '@remix-run/react'
 import { json, type DataFunctionArgs, redirect } from '@remix-run/node'
 import { Link } from '@remix-run/react'
 
 import Github from '~/images/github.tsx'
 
-import { useLoaderData } from '@remix-run/react'
 import { getSession } from '~/utils/session.server.ts'
 
 export async function loader({ request }: DataFunctionArgs) {
 	const urlObj = new URL(request.url)
 	console.log(urlObj)
 	const session = await getSession(request.headers.get('Cookie'))
-	const githubCookie = session.get('github-auth')
-	if (githubCookie) {
+	const userId: number = session.get('user-id')
+	if (userId) {
 		// redirect to the app page
 		return redirect('/app/summary')
 	}
 
-	
 	const redirectUri = `https://${urlObj.host}/github/oauth/callback`
-	console.log({redirectUri})
+	console.log({ redirectUri })
 	const githubUrl = new URL('https://github.com/login/oauth/authorize')
 	// TODO: use oktokit to generate this url
 	githubUrl.searchParams.set('client_id', process.env.GITHUB_CLIENT_ID || '')
