@@ -46,72 +46,80 @@ export async function loader({ request }: DataFunctionArgs) {
 	const timePeriod2Use = timePeriod as TimePeriod
 
 	const session = await getSession(request.headers.get('Cookie'))
-	const gitHubApiToken = await getGithubToken(session.get('user-id'))
+	// TODO: refacotr this huge try/catch
+	try {
+		const gitHubApiToken = await getGithubToken(session.get('user-id'))
 
-	const {
-		data: { name },
-	} = await getUser({ userName, githubCookie: gitHubApiToken })
-	const name2Use = name || userName
+		const {
+			data: { name },
+		} = await getUser({ userName, githubCookie: gitHubApiToken })
+		const name2Use = name || userName
 
-	return eventStream(request.signal, function setup(send, close) {
-		let quit = false
+		return eventStream(request.signal, function setup(send, close) {
+			let quit = false
 
-		generateSummary({
-			userName,
-			name: name2Use,
-			githubCookie: gitHubApiToken,
-			timePeriod: timePeriod2Use,
-			userId: session.get('user-id'),
-		})
-			.then(async generator => {
-				let count = 0
-				let buffer = []
-				while (!quit) {
-					const newItem = await generator.next()
-					buffer.push(newItem.value)
-					if (buffer.length >= BUFFER_SIZE || newItem.done) {
-						send({
-							event: 'githubData',
-							data: JSON.stringify({
-								value: buffer.join(''),
-								action: 'data',
-								index: count,
-							}),
-						})
-						// quit if we are done
-						if (newItem.done) {
-							// send empty data when we are done
+			generateSummary({
+				userName,
+				name: name2Use,
+				githubCookie: gitHubApiToken,
+				timePeriod: timePeriod2Use,
+				userId: session.get('user-id'),
+			})
+				.then(async generator => {
+					let count = 0
+					let buffer = []
+					while (!quit) {
+						const newItem = await generator.next()
+						buffer.push(newItem.value)
+						if (buffer.length >= BUFFER_SIZE || newItem.done) {
 							send({
 								event: 'githubData',
 								data: JSON.stringify({
-									action: 'stop',
-									index: count + 1,
+									value: buffer.join(''),
+									action: 'data',
+									index: count,
 								}),
 							})
-							quit = true
-							return
+							// quit if we are done
+							if (newItem.done) {
+								// send empty data when we are done
+								send({
+									event: 'githubData',
+									data: JSON.stringify({
+										action: 'stop',
+										index: count + 1,
+									}),
+								})
+								quit = true
+								return
+							}
+							// otherwise empty the buffer
+							count += 1
+							buffer = []
 						}
-						// otherwise empty the buffer
-						count += 1
-						buffer = []
 					}
-				}
-				console.log('post quit')
-				close()
-			})
-			.catch(err => {
-				console.log('got error', err)
-				send({
-					event: 'githubData',
-					data: JSON.stringify({
-						action: 'error',
-						message: err.message,
-					}),
+					close()
 				})
-				close()
-			})
-		return () => {
-			quit = true
+				.catch(err => {
+					console.log('got error', err)
+					send({
+						event: 'githubData',
+						data: JSON.stringify({
+							action: 'error',
+							message: err.message,
+						}),
+					})
+					close()
+				})
+			return () => {
+				quit = true
+			}
+		})
+	} catch (err) {
+		console.log('got error', err)
+		if (err instanceof Error) {
+			return streamErrorResponse(request, err.message)
 		}
-	})
+		return streamErrorResponse(request, 'Unknown error')
+	}
 }

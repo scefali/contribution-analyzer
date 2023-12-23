@@ -40,7 +40,7 @@ export function eventStream(
       let encoder = new TextEncoder();
 
       function send({ event = "message", data }: SendFunctionArgs) {
-        console.log('Event Stream Controller Send')
+        console.log('Event Stream Controller Send', data)
         controller.enqueue(encoder.encode(`event: ${event}\n`));
         controller.enqueue(encoder.encode(`data: ${data}\n\n`));
       }
