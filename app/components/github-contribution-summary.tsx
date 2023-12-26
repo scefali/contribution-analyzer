@@ -58,6 +58,7 @@ function GithubContributionSummary({ userName, timePeriod }: Props) {
 	useEffect(() => {
 		if (navigation.state === 'loading') {
 			setText('')
+			setError(null)
 		}
 	}, [navigation.state])
 
