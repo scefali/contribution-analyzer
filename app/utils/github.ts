@@ -15,7 +15,7 @@ export enum TimePeriod {
 }
 
 export const app = new OAuthApp({
-	clientType: 'oauth-app',
+	clientType: 'github-app',
 	clientId: process.env.GITHUB_CLIENT_ID || '',
 	clientSecret: process.env.GITHUB_CLIENT_SECRET || '',
 })

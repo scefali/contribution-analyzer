@@ -32,7 +32,6 @@ WORKDIR /myapp
 COPY --from=deps /myapp/node_modules /myapp/node_modules
 
 ADD prisma .
-RUN npx prisma generate
 
 ADD . .
 RUN npm run build
@@ -70,8 +69,10 @@ COPY --from=flyio/litefs:0.4.0 /usr/local/bin/litefs /usr/local/bin/litefs
 ADD other/litefs.yml /etc/litefs.yml
 RUN mkdir -p /data ${LITEFS_DIR}
 
+RUN npx prisma migrate reset
 RUN npx prisma migrate dev
 RUN npx prisma migrate deploy
+RUN npx prisma generate
 
 ADD . .
 

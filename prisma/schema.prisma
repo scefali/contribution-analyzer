@@ -14,8 +14,11 @@ model User {
   name         String?
   avatarUrl    String
   TeamMember   TeamMember[]
-  // TODO: use token that refreshes
-  githubToken  String
+
+  // Github specific info that might be broken out later
+  githubToken          String
+  githubTokenExpiresAt DateTime
+  githubRefreshToken   String
 }
 
 model TeamMember {

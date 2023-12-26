@@ -10,11 +10,15 @@ export async function loader({ request }: DataFunctionArgs) {
 	if (!code) {
 		return redirect('/github/install')
 	}
+
+	// TODO: better typing
 	const {
-		authentication: { token },
+		authentication: { token, refreshToken, expiresAt },
+	}: {
+		authentication: { token: string; refreshToken: string; expiresAt: string }
 	} = await app.createToken({
 		code,
-	})
+	}) as any
 
 	const { data } = await getMyUser({ githubCookie: token })
 	const baseParams = {
@@ -22,6 +26,8 @@ export async function loader({ request }: DataFunctionArgs) {
 		avatarUrl: data.avatar_url,
 		email: data.email,
 		githubToken: token,
+		githubRefreshToken: refreshToken,
+		githubTokenExpiresAt: expiresAt,
 	}
 
 	// create or update the user

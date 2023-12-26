@@ -4,7 +4,10 @@ CREATE TABLE "User" (
     "githubUserId" INTEGER NOT NULL,
     "email" TEXT,
     "name" TEXT,
-    "avatarUrl" TEXT NOT NULL
+    "avatarUrl" TEXT NOT NULL,
+    "githubToken" TEXT NOT NULL,
+    "githubTokenExpiresAt" DATETIME NOT NULL,
+    "githubRefreshToken" TEXT NOT NULL
 );
 
 -- CreateTable
