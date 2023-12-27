@@ -63,8 +63,6 @@ export async function loader({ request }: DataFunctionArgs) {
 			})
 		}
 
-		let quit = false
-
 		generateSummary({
 			userName,
 			name: name2Use,
@@ -75,7 +73,7 @@ export async function loader({ request }: DataFunctionArgs) {
 			.then(async generator => {
 				let count = 0
 				let buffer = []
-				while (!quit) {
+				while (true) {
 					const newItem = await generator.next()
 					buffer.push(newItem.value)
 					if (buffer.length >= BUFFER_SIZE || newItem.done) {
@@ -91,7 +89,7 @@ export async function loader({ request }: DataFunctionArgs) {
 								action: 'stop',
 								index: count + 1,
 							})
-							quit = true
+							close()
 							return
 						}
 						// otherwise empty the buffer
@@ -99,7 +97,6 @@ export async function loader({ request }: DataFunctionArgs) {
 						buffer = []
 					}
 				}
-				close()
 			})
 			.catch(err => {
 				console.log('got error', err)
@@ -110,7 +107,6 @@ export async function loader({ request }: DataFunctionArgs) {
 				close()
 			})
 		return () => {
-			quit = true
 			close()
 		}
 	})
