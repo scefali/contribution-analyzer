@@ -33,14 +33,12 @@ export function eventStream(
   init: InitFunction,
   options: ResponseInit = {}
 ) {
-  console.log('Event Stream Called')
   let stream = new ReadableStream({
     start(controller) {
       console.log('Event Stream Controller Started')
       let encoder = new TextEncoder();
 
       function send({ event = "message", data }: SendFunctionArgs) {
-        console.log('Event Stream Controller Send', data)
         controller.enqueue(encoder.encode(`event: ${event}\n`));
         controller.enqueue(encoder.encode(`data: ${data}\n\n`));
       }

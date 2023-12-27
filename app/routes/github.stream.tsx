@@ -48,64 +48,68 @@ export async function loader({ request }: DataFunctionArgs) {
 	const timePeriod2Use = timePeriod as TimePeriod
 
 	const session = await getSession(request.headers.get('Cookie'))
-	const gitHubApiToken = await getGithubToken(session.get('user-id'))
+	try {
+		const gitHubApiToken = await getGithubToken(session.get('user-id'))
+		const {
+			data: { name },
+		} = await getUser({ userName, githubCookie: gitHubApiToken })
+		const name2Use = name || userName
 
-	const {
-		data: { name },
-	} = await getUser({ userName, githubCookie: gitHubApiToken })
-	const name2Use = name || userName
-
-	return eventStream(request.signal, function setup(send, close) {
-		const sendMessage = (payload: object) => {
-			send({
-				event: 'githubData',
-				data: JSON.stringify(payload),
-			})
-		}
-
-		generateSummary({
-			userName,
-			name: name2Use,
-			githubCookie: gitHubApiToken,
-			timePeriod: timePeriod2Use,
-			userId: session.get('user-id'),
-		})
-			.then(async generator => {
-				let count = 0
-				let buffer = []
-				while (true) {
-					const newItem = await generator.next()
-					buffer.push(newItem.value)
-					if (buffer.length >= BUFFER_SIZE || newItem.done) {
-						sendMessage({
-							value: buffer.join(''),
-							action: 'data',
-							index: count,
-						})
-						// quit if we are done
-						if (newItem.done) {
-							// send empty data when we are done
-							sendMessage({
-								action: 'stop',
-								index: count + 1,
-							})
-							close()
-							return
-						}
-						// otherwise empty the buffer
-						count += 1
-						buffer = []
-					}
-				}
-			})
-			.catch(err => {
-				console.log('got error', err)
-				sendMessage({
-					action: 'error',
-					message: err.message,
+		return eventStream(request.signal, function setup(send, close) {
+			const sendMessage = (payload: object) => {
+				send({
+					event: 'githubData',
+					data: JSON.stringify(payload),
 				})
-				close()
+			}
+
+			generateSummary({
+				userName,
+				name: name2Use,
+				githubCookie: gitHubApiToken,
+				timePeriod: timePeriod2Use,
+				userId: session.get('user-id'),
 			})
-		return () => {}
-	})
+				.then(async generator => {
+					let count = 0
+					let buffer = []
+					while (true) {
+						const newItem = await generator.next()
+						buffer.push(newItem.value)
+						if (buffer.length >= BUFFER_SIZE || newItem.done) {
+							sendMessage({
+								value: buffer.join(''),
+								action: 'data',
+								index: count,
+							})
+							// quit if we are done
+							if (newItem.done) {
+								// send empty data when we are done
+								sendMessage({
+									action: 'stop',
+									index: count + 1,
+								})
+								close()
+								return
+							}
+							// otherwise empty the buffer
+							count += 1
+							buffer = []
+						}
+					}
+				})
+				.catch(err => {
+					console.log('got error', err)
+					sendMessage({
+						action: 'error',
+						message: err.message,
+					})
+					close()
+				})
+			return () => {}
+		})
+	} catch (error) {
+		console.error(error)
+		return streamErrorResponse(request, 'Unknown error')
+	}
 }
