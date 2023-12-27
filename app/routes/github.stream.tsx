@@ -1,8 +1,7 @@
 import { type DataFunctionArgs } from '@remix-run/node'
 
-import { generateSummary, getUser } from '~/utils/github.ts'
+import { generateSummary, getUser, TimePeriod } from '~/utils/github.ts'
 import { getSession } from '~/utils/session.server.ts'
-import { TimePeriod } from '~/utils/github.ts'
 import { eventStream } from '~/utils/event-stream.ts'
 import { getGithubToken } from '~/orm/user.server'
 
@@ -12,11 +11,14 @@ function streamResponse(
 	request: DataFunctionArgs['request'],
 	response: Object,
 ) {
-	return eventStream(request.signal, function setup(send) {
+	return eventStream(request.signal, function setup(send, close) {
 		send({
 			event: 'githubData',
 			data: JSON.stringify(response),
 		})
+		setTimeout(() => {
+			close()
+		}, 0)
 		return () => {}
 	})
 }
