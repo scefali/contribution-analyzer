@@ -33,6 +33,7 @@ function GithubContributionSummary({ userName, timePeriod }: Props) {
 			event: 'githubData',
 		},
 	)
+	console.log(streamArray)
 	const [text, setText] = useState('')
 	useEffect(() => {
 		const dataStreamsText = streamArray.map(stream => {

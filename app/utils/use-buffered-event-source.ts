@@ -3,7 +3,6 @@ import { useEffect, useState, useRef } from 'react'
 type EventSourceOptions = {
 	init?: EventSourceInit
 	event: string
-	flushTime?: number
 }
 
 type BaseEvent =
@@ -22,7 +21,7 @@ type BaseEvent =
  */
 export function useBufferedEventSource<Event extends BaseEvent>(
 	url: string | URL,
-	{ event, init, flushTime = 100 }: EventSourceOptions,
+	{ event, init }: EventSourceOptions,
 ) {
 	const timeoutRef = useRef<number | null>(null)
 	const [data, setData] = useState<Array<Event | null>>([])
@@ -31,7 +30,16 @@ export function useBufferedEventSource<Event extends BaseEvent>(
 		const eventSource = new EventSource(url, init)
 		eventSource.addEventListener(event, handler)
 		eventSource.onerror = function (errorEvent) {
-			console.error('EventSource failed:',errorEvent)
+			console.error('errorEvent', errorEvent)
+			// set error message
+			setData(oldData => [
+				...oldData,
+				{
+					action: 'error',
+					message: 'Unexpected error occurred',
+				} as unknown as Event,
+			])
+
 			// close connection
 			eventSource.removeEventListener(event, handler)
 			eventSource.close()

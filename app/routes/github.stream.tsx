@@ -106,8 +106,6 @@ export async function loader({ request }: DataFunctionArgs) {
 				})
 				close()
 			})
-		return () => {
-			close()
-		}
+		return () => {}
 	})
 }
