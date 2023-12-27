@@ -43,6 +43,7 @@ export async function action({
 		)
 	}
 
+
 	const session = await getSession(request.headers.get('Cookie'))
 	const gitHubApiToken = await getGithubToken(session.get('user-id'))
 	const userId: number = session.get('user-id')
@@ -87,6 +88,9 @@ export async function action({
 export async function loader({ request }: DataFunctionArgs) {
 	const session = await getSession(request.headers.get('Cookie'))
 	const userId: number = session.get('user-id')
+
+	const teamMembersCount = await prisma.teamMember.count()
+	console.log(`Number of team members in the database: ${teamMembersCount}`)
 
 	const teamMembers = await prisma.teamMember.findMany({
 		where: {
