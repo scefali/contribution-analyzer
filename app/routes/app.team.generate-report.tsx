@@ -23,6 +23,32 @@ export async function action({
 }: DataFunctionArgs): Promise<TypedResponse<ActionData>> {
 	const session = await getSession(request.headers.get('Cookie'))
 	const userId: number = session.get('user-id')
+	const user = await prisma.user.findUnique({
+		where: {
+			id: userId,
+		},
+	})
+	if (!user) {
+		return json(
+			{
+				status: 'error',
+				message: `User not found`,
+			},
+
+			{ status: 400 },
+		)
+	}
+	if (!user.email) {
+		return json(
+			{
+				status: 'error',
+				message: `Please add an email to your profile`,
+			},
+
+			{ status: 400 },
+		)
+	}
+
 	const teamMembers = await prisma.teamMember.findMany({
 		where: {
 			ownerId: userId,
@@ -47,13 +73,11 @@ export async function action({
 			}),
 		)
 
-		console.log(summaryList)
-
 		const { status, error } = await sendEmail({
 			react: (
 				<TeamSummary summaryList={summaryList} teamMembers={teamMembers} />
 			),
-			to: 'scefali@sentry.io',
+			to: user.email,
 			subject: 'Github Contribution Report for Team',
 		})
 		if (status !== 'success') {
