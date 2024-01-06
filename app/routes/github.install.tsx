@@ -9,7 +9,6 @@ import { getGithubToken } from '~/orm/user.server'
 
 export async function loader({ request }: DataFunctionArgs) {
 	const urlObj = new URL(request.url)
-	console.log(urlObj)
 	const session = await getSession(request.headers.get('Cookie'))
 	const userId: number = session.get('user-id')
 	if (userId) {
@@ -21,7 +20,6 @@ export async function loader({ request }: DataFunctionArgs) {
 			console.log('got error', { error })
 			if (error instanceof Prisma.PrismaClientKnownRequestError) {
 				if (error.code === "P2025" ) {
-					console.log('user not found')
 					session.unset('user-id')
 					session.unset('access-token')
 					session.unset('refresh-token')

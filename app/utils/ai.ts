@@ -25,6 +25,7 @@ export async function* generateSummaryForPrs({
 				const diffText = await response.text()
 				text += `Diff: ${diffText}`
 			}
+			console.log('text', text)
 			return text
 		}),
 	)
@@ -33,8 +34,11 @@ export async function* generateSummaryForPrs({
 	const prompt = `
     Below is a list of titles and bodies of PRs which ${name} has done in the past week.
     Create a summary below in the form of a list nothing outside the list.
-    Each item. should say what the PR does with a link at the end in the markdown format.
-		Each item should be a single line.
+    Each item should be a 1-3 sentence summary of the PR and include a link to the PR at the start
+		in markdown format. Explain what functionality is changing as well.
+
+		Example:
+		[Link](https://github.com/getsentry/sentry/pull/54735): Adds two notification tables (NotificationSettingOption and NotificationSettingProvider). These tables are the output of splitting the exisitng NotificationSetting table.
     ${customPrompt || ''}: 
     ${textBuffer.join('\n')}`
 
