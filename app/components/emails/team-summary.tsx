@@ -6,9 +6,9 @@ import {
 	Link,
 	Preview,
 	Section,
-	Text,
 	Heading,
 } from '@react-email/components'
+import { Markdown } from '@react-email/markdown'
 import { type TeamMember } from '~/utils/types.tsx'
 
 import Github from '~/images/github.tsx'
@@ -37,12 +37,7 @@ export const TeamSummary = ({ teamMembers, summaryList }: TeamSummaryProps) => (
 								if (!chunk) {
 									return null
 								}
-								return (
-									<Text key={index}>
-										{chunk}
-										<br />
-									</Text>
-								)
+								return <Markdown key={index}>{`${chunk}\n\n`}</Markdown>
 							})}
 						</Section>
 					)
