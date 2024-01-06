@@ -16,27 +16,37 @@ export async function loader({ request }: DataFunctionArgs) {
 		authentication: { token, refreshToken, expiresAt },
 	}: {
 		authentication: { token: string; refreshToken: string; expiresAt: string }
-	} = await app.createToken({
+	} = (await app.createToken({
 		code,
-	}) as any
+	})) as any
 
 	const { data } = await getMyUser({ githubCookie: token })
-	const baseParams = {
-		name: data.name,
-		avatarUrl: data.avatar_url,
-		email: data.email,
+
+	const gitHubUserId = data.id
+
+	const baseGitHubParams = {
 		githubToken: token,
 		githubRefreshToken: refreshToken,
 		githubTokenExpiresAt: expiresAt,
 	}
-
-	// create or update the user
+	const baseUserParams = {
+		name: data.name,
+		avatarUrl: data.avatar_url,
+		email: data.email,
+		gitHubUserId,
+	}
 	const user = await prisma.user.upsert({
-		where: { githubUserId: data.id },
-		update: baseParams,
+		where: { gitHubUserId: gitHubUserId },
+		update: baseUserParams,
+		create: baseUserParams,
+	})
+
+	await prisma.gitHubAuth.upsert({
+		where: { userId: user.id },
+		update: baseGitHubParams,
 		create: {
-			githubUserId: data.id,
-			...baseParams,
+			...baseGitHubParams,
+			userId: user.id,
 		},
 	})
 

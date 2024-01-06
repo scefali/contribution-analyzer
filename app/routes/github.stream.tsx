@@ -1,9 +1,10 @@
-import { type DataFunctionArgs } from '@remix-run/node'
+import { redirect, type DataFunctionArgs } from '@remix-run/node'
 
 import { generateSummary, getUser, TimePeriod } from '~/utils/github.ts'
 import { getSession } from '~/utils/session.server.ts'
 import { eventStream } from '~/utils/event-stream.ts'
 import { getGithubToken } from '~/orm/user.server'
+import { Prisma } from '@prisma/client'
 
 const BUFFER_SIZE = 1
 
@@ -109,6 +110,16 @@ export async function loader({ request }: DataFunctionArgs) {
 			return () => {}
 		})
 	} catch (error) {
+		// check if user does not exist
+		if (error instanceof Prisma.PrismaClientKnownRequestError) {
+			if (error.code === 'P2025') {
+				return streamResponse(request,{
+					action: 'redirect',
+					url: '/github/install',
+				})
+			}
+		}
+
 		console.error(error)
 		return streamErrorResponse(request, 'Unknown error')
 	}

@@ -100,6 +100,7 @@ export const generateSummary = async ({
 	console.group("considering", prs.length, "prs")
 	// if there are no prs, then we can't generate a summary
 	if (prs.length === 0) {
+		// TODO: better time period rendering
 		return yieldResult(`No PRs found for ${name} in the past ${timePeriod}`)
 	}
 

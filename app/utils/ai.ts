@@ -20,11 +20,11 @@ export async function* generateSummaryForPrs({
 			text += `Body: ${pr.body}`
 			text += `Link: ${pr.html_url}`
 			// TODO: Figure out better way of including the diff
-			// if (pr?.pull_request?.diff_url) {
-			// 	const response = await fetch(pr.pull_request.diff_url)
-			// 	const diffText = await response.text()
-			// 	text += `Diff: ${diffText}`
-			// }
+			if (pr?.pull_request?.diff_url) {
+				const response = await fetch(pr.pull_request.diff_url)
+				const diffText = await response.text()
+				text += `Diff: ${diffText}`
+			}
 			return text
 		}),
 	)

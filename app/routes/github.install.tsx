@@ -1,10 +1,11 @@
-import { useLoaderData } from '@remix-run/react'
+import { useLoaderData, Link} from '@remix-run/react'
 import { json, type DataFunctionArgs, redirect } from '@remix-run/node'
-import { Link } from '@remix-run/react'
+import { Prisma } from '@prisma/client'
 
 import Github from '~/images/github.tsx'
 
 import { getSession } from '~/utils/session.server.ts'
+import { getGithubToken } from '~/orm/user.server'
 
 export async function loader({ request }: DataFunctionArgs) {
 	const urlObj = new URL(request.url)
@@ -12,8 +13,21 @@ export async function loader({ request }: DataFunctionArgs) {
 	const session = await getSession(request.headers.get('Cookie'))
 	const userId: number = session.get('user-id')
 	if (userId) {
-		// redirect to the app page
-		return redirect('/app/summary')
+		try {
+			await getGithubToken(session.get('user-id'))
+			// redirect to the app page
+			return redirect('/app/summary')
+		} catch (error: unknown) {
+			console.log('got error', { error })
+			if (error instanceof Prisma.PrismaClientKnownRequestError) {
+				if (error.code === "P2025" ) {
+					console.log('user not found')
+					session.unset('user-id')
+					session.unset('access-token')
+					session.unset('refresh-token')
+				}
+			}
+		}
 	}
 
 	const redirectUri = `https://${urlObj.host}/github/oauth/callback`

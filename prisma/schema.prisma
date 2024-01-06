@@ -9,16 +9,23 @@ generator client {
 
 model User {
   id           Int          @id @default(autoincrement())
-  githubUserId Int          @unique
+  gitHubUserId Int          @unique
   email        String?
   name         String?
   avatarUrl    String
   TeamMember   TeamMember[]
+  GitHubAuth   GitHubAuth?
+}
 
-  // Github specific info that might be broken out later
+model GitHubAuth {
+  id                   Int      @id @default(autoincrement())
+  userId               Int      @unique
+  user                 User     @relation(fields: [userId], references: [id])
   githubToken          String
   githubTokenExpiresAt DateTime
   githubRefreshToken   String
+
+  @@index([userId])
 }
 
 model TeamMember {

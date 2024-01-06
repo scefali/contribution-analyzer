@@ -8,8 +8,7 @@ import { Loader2 } from 'lucide-react'
 
 import { Form, useNavigation, useSearchParams } from '@remix-run/react'
 
-import { getMyUser } from '~/utils/github.ts'
-import { getSession, destroySession } from '~/utils/session.server.ts'
+import { getSession } from '~/utils/session.server.ts'
 import { Input } from '~/@/components/ui/input.tsx'
 import { Button } from '~/@/components/ui/button.tsx'
 import {
@@ -21,7 +20,6 @@ import {
 } from '~/@/components/ui/select.tsx'
 import GithubContributionSummary from '~/components/github-contribution-summary.tsx'
 import AppLayout from '~/components/app-layout'
-import { getGithubToken } from '~/orm/user.server'
 
 type ActionData =
 	| { status: 'error'; message: string }

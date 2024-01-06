@@ -4,3 +4,11 @@ export class LLMRateLimitError extends Error {
 		this.name = 'LLMRateLimitError'
 	}
 }
+
+
+export class BadRefreshTokenError extends Error {
+	constructor() {
+		super('BadRefreshTokenError')
+		this.name = 'BadRefreshTokenError'
+	}
+}

@@ -1,4 +1,4 @@
-import { useNavigation } from '@remix-run/react'
+import { useNavigation, useNavigate } from '@remix-run/react'
 import ReactMarkdown from 'react-markdown'
 import { useEffect, useState } from 'react'
 import { useBufferedEventSource } from '~/utils/use-buffered-event-source.ts'
@@ -20,9 +20,14 @@ type StreamData =
 	| {
 			action: 'stop'
 	  }
+	| {
+			action: 'redirect'
+			url: string
+	  }
 
 function GithubContributionSummary({ userName, timePeriod }: Props) {
 	const navigation = useNavigation()
+	const navigate = useNavigate()
 	const queryParams = new URLSearchParams({
 		userName,
 		timePeriod,
@@ -53,7 +58,13 @@ function GithubContributionSummary({ userName, timePeriod }: Props) {
 		if (errorStream && errorStream.action === 'error') {
 			setError(errorStream.message)
 		}
-	}, [streamArray])
+		const redirectStream = streamArray.find(stream => {
+			return stream?.action === 'redirect'
+		})
+		if (redirectStream && redirectStream.action === 'redirect') {
+			navigate(redirectStream.url)
+		}
+	}, [streamArray, navigate])
 
 	// clear the text when the user presses submitƒ
 	useEffect(() => {
