@@ -64,6 +64,9 @@ export const getPrsForSummary = async ({
 		},
 	)
 	const output = (await response.json()) as SearchIssuesResponseType['data']
+	if (!output.items) {
+		return []
+	}
 	// filter out PRs that are older than startDate
 	const prs = output.items.filter(pr => {
 		if (!pr.closed_at) {

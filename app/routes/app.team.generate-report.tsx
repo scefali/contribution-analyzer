@@ -38,7 +38,6 @@ export async function action({
 					githubCookie: gitHubApiToken,
 					userName: member.gitHubUserName,
 					timePeriod: TimePeriod.OneWeek,
-					customPrompt: 'Include links to the PRs for each item',
 				})
 				const output = []
 				for await (const value of iterator) {
