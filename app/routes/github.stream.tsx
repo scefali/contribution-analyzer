@@ -1,12 +1,10 @@
-import { redirect, type DataFunctionArgs } from '@remix-run/node'
+import { type DataFunctionArgs } from '@remix-run/node'
 
 import { generateSummary, getUser, TimePeriod } from '~/utils/github.ts'
 import { getSession } from '~/utils/session.server.ts'
 import { eventStream } from '~/utils/event-stream.ts'
 import { getGithubToken } from '~/orm/user.server'
 import { Prisma } from '@prisma/client'
-
-const BUFFER_SIZE = 1
 
 function streamResponse(
 	request: DataFunctionArgs['request'],
@@ -71,49 +69,53 @@ export async function loader({ request }: DataFunctionArgs) {
 				timePeriod: timePeriod2Use,
 				userId: session.get('user-id'),
 			})
-				.then(async generator => {
+				.then(async generators => {
+					if (generators.length === 0) {
+						sendMessage({
+							action: 'error',
+							message: 'No PRs found',
+						})
+						close()
+						return
+					}
 					let count = 0
-					let buffer = []
-					while (true) {
-						const newItem = await generator.next()
-						buffer.push(newItem.value)
-						if (buffer.length >= BUFFER_SIZE || newItem.done) {
-							sendMessage({
-								value: buffer.join(''),
-								action: 'data',
-								index: count,
-							})
+					for await (const generator of generators) {
+						while (true) {
+							const newItem = await generator.next()
+							if (newItem.done) {
+								break
+							}
+							sendMessage({ index: count, ...newItem.value })
+							count += 1
 							// quit if we are done
 							if (newItem.done) {
-								// send empty data when we are done
-								sendMessage({
-									action: 'stop',
-									index: count + 1,
-								})
-								close()
-								return
+								break
 							}
-							// otherwise empty the buffer
-							count += 1
-							buffer = []
 						}
 					}
+
+					// send empty data when we are done
+					sendMessage({
+						action: 'stop',
+						index: count + 1,
+					})
+					close()
 				})
 				.catch(err => {
-					console.log('got error', err)
 					sendMessage({
 						action: 'error',
 						message: err.message,
 					})
 					close()
 				})
+
 			return () => {}
 		})
 	} catch (error) {
 		// check if user does not exist
 		if (error instanceof Prisma.PrismaClientKnownRequestError) {
 			if (error.code === 'P2025') {
-				return streamResponse(request,{
+				return streamResponse(request, {
 					action: 'redirect',
 					url: '/github/install',
 				})

@@ -68,20 +68,24 @@ export const getPrsForSummary = async ({
 		return []
 	}
 	// filter out PRs that are older than startDate
-	const prs = output.items.filter(pr => {
-		if (!pr.closed_at) {
-			return false
-		}
-		const prDate = new Date(pr.closed_at)
-		return prDate >= cutoffDate
-	})
+	const prs = output.items
+		.filter(pr => {
+			if (!pr.closed_at) {
+				return false
+			}
+			const prDate = new Date(pr.closed_at)
+			return prDate >= cutoffDate
+		})
+		.sort((a, b) => {
+			if (!a.closed_at || !b.closed_at) {
+				return 0
+			}
+			const dateA = new Date(a.closed_at);
+			const dateB = new Date(b.closed_at);
+			return dateB.getTime() - dateA.getTime();
+		})
 	return prs
 }
-
-function* yieldResult(result: string) {
-  yield result;
-}
-
 
 export const generateSummary = async ({
 	userId,
@@ -99,14 +103,6 @@ export const generateSummary = async ({
 	customPrompt?: string
 }) => {
 	const prs = await getPrsForSummary({ userName, githubCookie, timePeriod })
-
-	console.group("considering", prs.length, "prs")
-	// if there are no prs, then we can't generate a summary
-	if (prs.length === 0) {
-		// TODO: better time period rendering
-		return yieldResult(`No PRs found for ${name} in the past ${timePeriod}`)
-	}
-
 	return generateSummaryForPrs({ prs, name, customPrompt, userId })
 }
 

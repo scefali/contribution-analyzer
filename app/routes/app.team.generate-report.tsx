@@ -5,13 +5,11 @@ import {
 } from '@remix-run/node'
 
 import { sendEmail } from '~/utils/email.server.ts'
-import { TimePeriod, generateSummary } from '~/utils/github.ts'
 
-import TeamSummary from '~/components/emails/team-summary.tsx'
 import { getSession } from '~/utils/session.server.ts'
 import { prisma } from '~/utils/db.server.ts'
 import { LLMRateLimitError } from '~/utils/errors'
-import { getGithubToken } from '~/orm/user.server'
+import { generateTeamSummaryForUser } from '~/utils/reports'
 
 interface ActionData {
 	status: 'error' | 'success'
@@ -49,41 +47,16 @@ export async function action({
 		)
 	}
 
-	const teamMembers = await prisma.teamMember.findMany({
-		where: {
-			ownerId: userId,
-		},
-	})
-	const gitHubApiToken = await getGithubToken(userId)
 	try {
-		const summaryList = await Promise.all(
-			teamMembers.map(async member => {
-				const iterator = await generateSummary({
-					userId,
-					name: member.name || 'Unknown',
-					githubCookie: gitHubApiToken,
-					userName: member.gitHubUserName,
-					timePeriod: TimePeriod.OneWeek,
-				})
-				const output = []
-				for await (const value of iterator) {
-					output.push(value)
-				}
-				return output.join('')
-			}),
-		)
-
+		const component = await generateTeamSummaryForUser(user)
 		const { status, error } = await sendEmail({
-			react: (
-				<TeamSummary summaryList={summaryList} teamMembers={teamMembers} />
-			),
+			react: component,
 			to: user.email,
 			subject: 'Github Contribution Report for Team',
 		})
 		if (status !== 'success') {
 			return json({ status: 'error', message: error.message }, { status: 400 })
 		}
-		return json({ status: 'success' })
 	} catch (error) {
 		if (error instanceof LLMRateLimitError) {
 			return json(
@@ -95,6 +68,10 @@ export async function action({
 				{ status: 429 },
 			)
 		}
+		if (error instanceof Error) {
+			return json({ status: 'error', message: error.message }, { status: 500 })
+		}
 		return json({ status: 'error', message: 'Unknown error' }, { status: 500 })
 	}
+	return json({ status: 'success' })
 }
