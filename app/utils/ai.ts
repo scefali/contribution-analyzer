@@ -1,9 +1,9 @@
 import { createSimpleCompletion } from './chatGPT.ts'
 import type { PullRequest } from './github.ts'
 
-const MAX_TOKENS = 16000
+const MAX_DIFF_LENGTH = 1000
 
-export async function* generateSummaryForPrs({
+export async function generateSummaryForPrs({
 	name,
 	prs,
 	customPrompt,
@@ -14,48 +14,70 @@ export async function* generateSummaryForPrs({
 	customPrompt?: string
 	userId: number
 }) {
-	// Add the title, body, and link of each PR to the text buffer
-	const maxPrContentLength = Math.floor(MAX_TOKENS / prs.length)
-	const textBuffer = await Promise.all(
+	const prDataArray = await Promise.all(
 		prs.map(async pr => {
-			let prContent = `Title: ${pr.title} Body: ${pr.body} Link: ${pr.html_url}`
+			let diff = ''
+			// TODO: add comment data
 			if (pr?.pull_request?.diff_url) {
 				const response = await fetch(pr.pull_request.diff_url)
 				const diffText = await response.text()
-				prContent += `Diff: ${diffText}`
+				diff = diffText.substring(0, MAX_DIFF_LENGTH)
 			}
-			if (prContent.length > maxPrContentLength) {
-				return prContent.substring(0, maxPrContentLength)
-			} else {
-				return prContent
+
+			// Add metadata related to the PR
+			const prContent = {
+				title: pr.title,
+				body: pr.body,
+				link: pr.html_url,
+				diff: diff,
+				id: pr.id,
+				closedAt: pr.closed_at,
 			}
+			return prContent
 		}),
 	)
 
-	// Construct the prompt for OpenAI
-	const prompt = `
-    Below is a list of titles and bodies of PRs which ${name} has done in the past week.
-    Create a summary below in the form of a list nothing outside the list.
-    Each item should be a 2-3 sentence summary of the PR and include a link to the PR at the start
-		in markdown format. Explain what functionality is changing as well. Each item should be separated by a new line.
+	return Promise.all(
+		prDataArray.map(async function* (pr) {
+			const prMetadata = {
+				action: 'metadata',
+				data: {
+					title: pr.title,
+					link: pr.link,
+					id: pr.id,
+					closedAt: pr.closedAt,
+				},
+			}
+			yield prMetadata
+			// Construct the prompt for OpenAI
+			const prompt = `
+				Create a summary of this PR based on the JSON representation of the PR below.
+				The summary should be 2-3 sentences.
+				${customPrompt || ''}: 
 
-    ${customPrompt || ''}: 
+				Example:
+				Adds two notification tables (NotificationSettingOption and NotificationSettingProvider). These tables are the output of splitting the exisitng NotificationSetting table.
 
-		Example:
-		[Link](https://github.com/getsentry/sentry/pull/54735) Adds two notification tables (NotificationSettingOption and NotificationSettingProvider). These tables are the output of splitting the exisitng NotificationSetting table.
+				User's PR:
+				${JSON.stringify({
+					title: pr.title,
+					body: pr.body,
+					diff: pr.diff,
+				})}`
+			const generator = createSimpleCompletion(prompt, userId)
 
-		Users's PRs:
-    ${textBuffer.join('\n')}`
-
-	console.log('prompt', prompt)
-
-	// Generate the summary using OpenAI
-	const generator = createSimpleCompletion(prompt, userId)
-	while (true) {
-		const newItem = await generator.next()
-		if (newItem.done) {
-			return
-		}
-		yield newItem.value
-	}
+			// Generate the summary using OpenAI
+			while (true) {
+				const newItem = await generator.next()
+				if (newItem.done) {
+					return
+				}
+				const message = {
+					action: 'summary',
+					data: { text: newItem.value, id: pr.id },
+				}
+				yield message
+			}
+		}),
+	)
 }

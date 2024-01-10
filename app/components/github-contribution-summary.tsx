@@ -14,8 +14,20 @@ type StreamData =
 			message: string
 	  }
 	| {
-			action: 'data'
-			value: string
+			action: 'metadata'
+			data: {
+				title: string
+				link: string
+				id: number
+				closedAt: string
+			}
+	  }
+	| {
+			action: 'summary'
+			data: {
+				text: string
+				id: number
+			}
 	  }
 	| {
 			action: 'stop'
@@ -38,15 +50,55 @@ function GithubContributionSummary({ userName, timePeriod }: Props) {
 			event: 'githubData',
 		},
 	)
-	console.log(streamArray)
-	const [text, setText] = useState('')
+
+	const [prs, setPrs] = useState<
+		{
+			id: number
+			title: string
+			link: string
+			summary: string
+			closedAt: string
+		}[]
+	>([])
 	useEffect(() => {
-		const dataStreamsText = streamArray.map(stream => {
-			if (!stream) return ''
-			if (stream.action !== 'data') return ''
-			return stream.value
+		// set up the metadata
+		streamArray.forEach(stream => {
+			console.log('stream', stream)
+			if (!stream) return
+			if (stream.action === 'metadata') {
+				setPrs(prevPrs => {
+					const prExists = prevPrs.some(pr => pr.id === stream.data.id)
+					if (prExists) {
+						return prevPrs
+					} else {
+						return [
+							...prevPrs,
+							{
+								summary: '',
+								...stream.data,
+							},
+						]
+					}
+				})
+			}
 		})
-		setText(dataStreamsText.join(''))
+		// populate the summary
+		const summmaries = streamArray.reduce((acc, stream) => {
+			if (stream?.action !== 'summary') return acc
+			if (!acc[stream.data.id]) {
+				acc[stream.data.id] = ''
+			}
+			acc[stream.data.id] += stream.data.text
+			return acc
+		}, {} as Record<number, string>)
+		setPrs(prevPrs => {
+			return prevPrs.map(pr => {
+				return {
+					...pr,
+					summary: summmaries[pr.id],
+				}
+			})
+		})
 	}, [streamArray])
 
 	const [error, setError] = useState<string | null>(null)
@@ -69,26 +121,39 @@ function GithubContributionSummary({ userName, timePeriod }: Props) {
 	// clear the text when the user presses submitƒ
 	useEffect(() => {
 		if (navigation.state === 'loading') {
-			setText('')
+			setPrs([])
 			setError(null)
 		}
 	}, [navigation.state])
 
-	const renderText = () => {
-		if (!text && !error) {
+	const renderContent = () => {
+		if (!setPrs.length && !error) {
 			return <p className="text-left">Loading...</p>
 		}
-		// clean up the text
-		return (
-			<ReactMarkdown className="markdown-content text-left">
-				{text.trim()}
-			</ReactMarkdown>
-		)
+		if (prs.length) {
+			return prs.map(pr => (
+				<div key={pr.id} className="mt-4">
+					<div className="mt-4 whitespace-pre-wrap">
+						{new Date(pr.closedAt).toLocaleDateString()}
+					</div>
+					<a
+						className="text-blue-500 underline"
+						href={pr.link}
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						{pr.title}
+					</a>
+					<div className="mt-2">{pr.summary}</div>
+					<br />
+				</div>
+			))
+		}
 	}
 	return (
 		<div className="flex flex-col pt-4 text-left">
 			{error && <p className="text-red-500">{error}</p>}
-			<div className="mt-4 whitespace-pre-wrap">{renderText()}</div>
+			<div className="mt-4 whitespace-pre-wrap">{renderContent()}</div>
 		</div>
 	)
 }
