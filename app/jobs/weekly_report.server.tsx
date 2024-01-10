@@ -1,14 +1,12 @@
 import { cronTrigger } from '@trigger.dev/sdk'
 import { PrismaClient } from '@prisma/client'
 import { sendEmail } from '~/utils/email.server.ts'
-import { TimePeriod, generateSummary } from '~/utils/github.ts'
-import TeamSummary from '~/components/emails/team-summary.tsx'
 import type { User } from '@prisma/client'
 import { client } from '~/trigger.server'
+import { generateTeamSummaryForUser } from '~/utils/reports'
 
 const prisma = new PrismaClient()
 
-console.log('weekly-report-job')
 export const job = client.defineJob({
 	id: 'weekly-report-job',
 	name: 'Weekly Report Job',
@@ -29,36 +27,15 @@ export const job = client.defineJob({
 })
 
 async function generateSummaryForUser(user: User) {
-	const teamMembers = await prisma.teamMember.findMany({
-		where: {
-			ownerId: user.id,
-		},
-	})
-	if (teamMembers.length === 0) {
+	// TODO: better handling
+	if (!user.email) {
 		return
 	}
-
-	// for each team member, generate a summary
-	const summaryList = await Promise.all(
-		teamMembers.map(async member => {
-			const iterator = await generateSummary({
-				userId: user.id,
-				name: member.name || 'Unknown',
-				githubCookie: user.githubToken,
-				userName: member.gitHubUserName,
-				timePeriod: TimePeriod.OneWeek,
-			})
-			const output = []
-			for await (const value of iterator) {
-				output.push(value)
-			}
-			return output.join('')
-		}),
-	)
+	const component = await generateTeamSummaryForUser(user)
 
 	const { status, error } = await sendEmail({
-		react: <TeamSummary summaryList={summaryList} teamMembers={teamMembers} />,
-		to: 'scefali@sentry.io',
+		react: component,
+		to: user.email,
 		subject: 'Github Contribution Report for Team',
 	})
 	if (status !== 'success') {

@@ -68,16 +68,24 @@ export const getPrsForSummary = async ({
 		return []
 	}
 	// filter out PRs that are older than startDate
-	const prs = output.items.filter(pr => {
-		if (!pr.closed_at) {
-			return false
-		}
-		const prDate = new Date(pr.closed_at)
-		return prDate >= cutoffDate
-	})
+	const prs = output.items
+		.filter(pr => {
+			if (!pr.closed_at) {
+				return false
+			}
+			const prDate = new Date(pr.closed_at)
+			return prDate >= cutoffDate
+		})
+		.sort((a, b) => {
+			if (!a.closed_at || !b.closed_at) {
+				return 0
+			}
+			const dateA = new Date(a.closed_at);
+			const dateB = new Date(b.closed_at);
+			return dateB.getTime() - dateA.getTime();
+		})
 	return prs
 }
-
 
 export const generateSummary = async ({
 	userId,

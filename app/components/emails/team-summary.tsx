@@ -9,13 +9,13 @@ import {
 	Heading,
 } from '@react-email/components'
 import { Markdown } from '@react-email/markdown'
-import { type TeamMember } from '~/utils/types.tsx'
+import { type ProcessedPrData, type TeamMember } from '~/utils/types.tsx'
 
 import Github from '~/images/github.tsx'
 
 interface TeamSummaryProps {
 	teamMembers: TeamMember[]
-	summaryList: string[]
+	summaryList: ProcessedPrData[][]
 }
 
 export const TeamSummary = ({ teamMembers, summaryList }: TeamSummaryProps) => (
@@ -26,19 +26,15 @@ export const TeamSummary = ({ teamMembers, summaryList }: TeamSummaryProps) => (
 			<Container style={container}>
 				<Github />
 				{teamMembers.map((member, index) => {
-					const summary = summaryList[index]
-					const chunks = summary.split('\n').map(chunk => chunk.trim())
+					const prList = summaryList[index]
 					return (
 						<Section key={index}>
 							<Link href={`https://github.com/${member.gitHubUserName}`}>
 								<Heading>{member.name}</Heading>
 							</Link>
-							{chunks.map((chunk, index) => {
-								if (!chunk) {
-									return null
-								}
-								return <Markdown key={index}>{`${chunk}\n\n`}</Markdown>
-							})}
+							{prList.map((pr, index) => (
+								<Markdown key={index}>{pr.summary}</Markdown>
+							))}
 						</Section>
 					)
 				})}

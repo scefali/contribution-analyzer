@@ -1,41 +1,12 @@
 import { useNavigation, useNavigate } from '@remix-run/react'
-import ReactMarkdown from 'react-markdown'
 import { useEffect, useState } from 'react'
 import { useBufferedEventSource } from '~/utils/use-buffered-event-source.ts'
+import { type StreamData } from '~/utils/types.tsx'
 
 interface Props {
 	userName: string
 	timePeriod: string
 }
-
-type StreamData =
-	| {
-			action: 'error'
-			message: string
-	  }
-	| {
-			action: 'metadata'
-			data: {
-				title: string
-				link: string
-				id: number
-				closedAt: string
-			}
-	  }
-	| {
-			action: 'summary'
-			data: {
-				text: string
-				id: number
-			}
-	  }
-	| {
-			action: 'stop'
-	  }
-	| {
-			action: 'redirect'
-			url: string
-	  }
 
 function GithubContributionSummary({ userName, timePeriod }: Props) {
 	const navigation = useNavigation()

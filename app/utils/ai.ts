@@ -31,7 +31,7 @@ export async function generateSummaryForPrs({
 				link: pr.html_url,
 				diff: diff,
 				id: pr.id,
-				closedAt: pr.closed_at,
+				closedAt: pr.closed_at as string, // we've already filtered out PRs that are open
 			}
 			return prContent
 		}),
@@ -47,8 +47,10 @@ export async function generateSummaryForPrs({
 					id: pr.id,
 					closedAt: pr.closedAt,
 				},
-			}
+			} as const
+			console.log('prMetadata', prMetadata)
 			yield prMetadata
+			console.log('here')
 			// Construct the prompt for OpenAI
 			const prompt = `
 				Create a summary of this PR based on the JSON representation of the PR below.
@@ -65,17 +67,19 @@ export async function generateSummaryForPrs({
 					diff: pr.diff,
 				})}`
 			const generator = createSimpleCompletion(prompt, userId)
+			console.log('ran complete')
 
 			// Generate the summary using OpenAI
 			while (true) {
 				const newItem = await generator.next()
+				console.log('newItem', newItem)
 				if (newItem.done) {
 					return
 				}
 				const message = {
 					action: 'summary',
 					data: { text: newItem.value, id: pr.id },
-				}
+				} as const
 				yield message
 			}
 		}),
