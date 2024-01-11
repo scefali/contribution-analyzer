@@ -20,6 +20,8 @@ import {
 } from '~/@/components/ui/select.tsx'
 import GithubContributionSummary from '~/components/github-contribution-summary.tsx'
 import AppLayout from '~/components/app-layout'
+import FeedbackButton from '~/components/feedback-button'
+import { prisma } from '~/utils/db.server'
 
 type ActionData =
 	| { status: 'error'; message: string }
@@ -46,7 +48,10 @@ export async function loader({ request }: DataFunctionArgs) {
 	if (!userId) {
 		return redirect('/github/install')
 	}
-	return null
+	const user = await prisma.user.findUniqueOrThrow({
+		where: { id: userId },
+	})
+	return { user }
 }
 
 export default function Summary() {
@@ -55,7 +60,7 @@ export default function Summary() {
 	const timePeriod = queryParams.get('timePeriod')
 	const navigation = useNavigation()
 	const submitting = navigation.state === 'submitting'
-	const disableButton = submitting
+	const disableButton = submitting;
 	return (
 		<AppLayout>
 			<Form
@@ -63,14 +68,16 @@ export default function Summary() {
 				action="/app/summary"
 				method="GET"
 			>
-				<h1 className="text-lg font-bold">
-					See a Summary of Github Contributions
-				</h1>
+				<div className="flex justify-between	">
+					<h1 className="text-lg font-bold">
+						See a Summary of Github Contributions
+					</h1>
+					<FeedbackButton />
+				</div>
 				<Input
 					type="text"
 					placeholder="GitHub Username"
 					name="userName"
-					className="mt-4 max-w-md"
 					required
 					defaultValue={queryParams.get('userName') || ''}
 				/>

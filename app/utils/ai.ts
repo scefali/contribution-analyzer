@@ -16,21 +16,13 @@ export async function generateSummaryForPrs({
 }) {
 	const prDataArray = await Promise.all(
 		prs.map(async pr => {
-			let diff = ''
-			// TODO: add comment data
-			if (pr?.pull_request?.diff_url) {
-				const response = await fetch(pr.pull_request.diff_url)
-				const diffText = await response.text()
-				diff = diffText.substring(0, MAX_DIFF_LENGTH)
-			}
-
 			// Add metadata related to the PR
 			const prContent = {
 				title: pr.title,
 				body: pr.body,
 				link: pr.html_url,
-				diff: diff,
 				id: pr.id,
+				diffUrl: pr?.pull_request?.diff_url,
 				closedAt: pr.closed_at as string, // we've already filtered out PRs that are open
 			}
 			return prContent
@@ -39,6 +31,16 @@ export async function generateSummaryForPrs({
 
 	return Promise.all(
 		prDataArray.map(async function* (pr) {
+			// load the diff if it's avaialable on-demand
+			let diff = ''
+			if (pr.diffUrl) {
+				const response = await fetch(pr.diffUrl)
+				const diffText = await response.text()
+				diff = diffText.substring(0, MAX_DIFF_LENGTH)
+			}
+
+			// TODO: add comment data
+
 			const prMetadata = {
 				action: 'metadata',
 				data: {
@@ -48,9 +50,7 @@ export async function generateSummaryForPrs({
 					closedAt: pr.closedAt,
 				},
 			} as const
-			console.log('prMetadata', prMetadata)
 			yield prMetadata
-			console.log('here')
 			// Construct the prompt for OpenAI
 			const prompt = `
 				Create a summary of this PR based on the JSON representation of the PR below.
@@ -64,10 +64,9 @@ export async function generateSummaryForPrs({
 				${JSON.stringify({
 					title: pr.title,
 					body: pr.body,
-					diff: pr.diff,
+					diff: diff,
 				})}`
 			const generator = createSimpleCompletion(prompt, userId)
-			console.log('ran complete')
 
 			// Generate the summary using OpenAI
 			while (true) {

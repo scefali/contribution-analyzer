@@ -15,7 +15,18 @@ export function init() {
 			}),
 			// Replay is only available in the client
 			new Sentry.Replay(),
+			new Sentry.Feedback({
+				// Additional SDK configuration goes in here, for example:
+				colorScheme: 'dark',
+			}),
 		],
+		beforeSend(event, hint) {
+			// Check if it is an exception, and if so, show the report dialog
+			if (event.exception) {
+				Sentry.showReportDialog({ eventId: event.event_id })
+			}
+			return event
+		},
 
 		// Set tracesSampleRate to 1.0 to capture 100%
 		// of transactions for performance monitoring.

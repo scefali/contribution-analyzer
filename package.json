@@ -52,7 +52,7 @@
     "@remix-run/react": "^1.17.1",
     "@remix-run/router": "^1.6.3",
     "@remix-run/server-runtime": "^1.17.1",
-    "@sentry/remix": "^7.54.0",
+    "@sentry/remix": "^7.93.0",
     "@tailwindcss/typography": "^0.5.9",
     "@trigger.dev/react": "^2.3.6",
     "@trigger.dev/remix": "^2.3.6",

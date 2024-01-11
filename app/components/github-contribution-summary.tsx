@@ -34,7 +34,6 @@ function GithubContributionSummary({ userName, timePeriod }: Props) {
 	useEffect(() => {
 		// set up the metadata
 		streamArray.forEach(stream => {
-			console.log('stream', stream)
 			if (!stream) return
 			if (stream.action === 'metadata') {
 				setPrs(prevPrs => {
@@ -103,19 +102,19 @@ function GithubContributionSummary({ userName, timePeriod }: Props) {
 		}
 		if (prs.length) {
 			return prs.map(pr => (
-				<div key={pr.id} className="mt-4">
-					<div className="mt-4 whitespace-pre-wrap">
-						{new Date(pr.closedAt).toLocaleDateString()}
+				<div key={pr.id}>
+					<div className="flex gap-2">
+						{new Date(pr.closedAt).toLocaleDateString()}:
+						<a
+							className="text-blue-500 underline"
+							href={pr.link}
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							{pr.title}
+						</a>
 					</div>
-					<a
-						className="text-blue-500 underline"
-						href={pr.link}
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						{pr.title}
-					</a>
-					<div className="mt-2">{pr.summary}</div>
+					<div>{pr.summary}</div>
 					<br />
 				</div>
 			))
@@ -124,7 +123,7 @@ function GithubContributionSummary({ userName, timePeriod }: Props) {
 	return (
 		<div className="flex flex-col pt-4 text-left">
 			{error && <p className="text-red-500">{error}</p>}
-			<div className="mt-4 whitespace-pre-wrap">{renderContent()}</div>
+			<div className="whitespace-pre-wrap">{renderContent()}</div>
 		</div>
 	)
 }
