@@ -27,7 +27,9 @@ export async function* createSimpleCompletionNoCache(prompt: string) {
 }
 
 /**
- *
+ * Creates a stream of messages from our LLM service
+ * Handles rate limiting but does not handle caching since
+ * that is done in generateSummaryForPrs
  */
 export async function* createSimpleCompletion(prompt: string, userId: number) {
 	// Increment and check rate limit

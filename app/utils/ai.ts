@@ -48,7 +48,7 @@ export async function generateSummaryForPrs({
 	let prDataArray = await Promise.all(prs.map(getPrContentData))
 
 	// load all summaries in the cache in parallel
-	const cachedPRSummaries = await Promise.all(
+	let prsToFetch = await Promise.all(
 		prDataArray.map(async pr => {
 			const cached = await getCache(pr.id.toString())
 			if (cached) {
@@ -60,7 +60,7 @@ export async function generateSummaryForPrs({
 
 	const prsWithCachedSummaries = []
 	// iterate through the cached responses that exist and yield them
-	for (const cached of cachedPRSummaries) {
+	for (const cached of prsToFetch) {
 		// we only want to immediately pre-populate consecutive summaries from the beginning
 		// if we don't, then flickers will happen
 		if (!cached.summary) {
@@ -69,7 +69,7 @@ export async function generateSummaryForPrs({
 		if (cached.summary) {
 			// remove the item so we don't yield it again
 			prsWithCachedSummaries.push(cached)
-			prDataArray = prDataArray.filter(prItem => prItem.id !== cached.id)
+			prsToFetch = prsToFetch.filter(prItem => prItem.id !== cached.id)
 		}
 	}
 
@@ -82,7 +82,15 @@ export async function generateSummaryForPrs({
 				yield generateSummaryAction(pr.summary, pr.id)
 			})
 			.concat(
-				prDataArray.map(async function* (pr) {
+				prsToFetch.map(async function* (pr) {
+					// next try to find the cached summary if it exists
+					// this can happen if there are new PRS at the top already
+					if (pr.summary) {
+						yield getMetadataAction(pr)
+						yield generateSummaryAction(pr.summary, pr.id)
+						return
+					}
+
 					// load the diff if it's avaialable on-demand
 					let diff = ''
 					if (pr.diffUrl) {
@@ -112,7 +120,6 @@ export async function generateSummaryForPrs({
 
 					// Generate the summary using OpenAI
 					let summary = ''
-
 
 					let first = true
 					while (true) {
