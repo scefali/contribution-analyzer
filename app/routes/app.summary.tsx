@@ -47,7 +47,7 @@ export async function loader({ request }: DataFunctionArgs) {
 	if (!userId) {
 		return redirect('/github/install')
 	}
-	const user = await prisma.user.findUniqueOrThrow({
+	const user = await prisma.user.findUnique({
 		where: { id: userId },
 	})
 	return { user }
