@@ -1,5 +1,6 @@
 import { useLocation, useMatches } from '@remix-run/react'
 import * as Sentry from '@sentry/remix'
+import Plausible from 'plausible-tracker'
 import { useEffect } from 'react'
 
 export function init() {
@@ -42,4 +43,6 @@ export function init() {
 		replaysSessionSampleRate: 0.1,
 		replaysOnErrorSampleRate: 1.0,
 	})
+	const { enableAutoPageviews } = Plausible({ trackLocalhost: true })
+	enableAutoPageviews()
 }
