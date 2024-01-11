@@ -1,5 +1,7 @@
 import { useNavigation, useNavigate } from '@remix-run/react'
 import { useEffect, useState } from 'react'
+import Markdown from 'react-markdown'
+
 import { useBufferedEventSource } from '~/utils/use-buffered-event-source.ts'
 import { type StreamData } from '~/utils/types.tsx'
 
@@ -111,10 +113,10 @@ function GithubContributionSummary({ userName, timePeriod }: Props) {
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							{pr.title}
+							<Markdown>{pr.title}</Markdown>
 						</a>
 					</div>
-					<div>{pr.summary}</div>
+					<Markdown>{pr.summary}</Markdown>
 					<br />
 				</div>
 			))
