@@ -1,5 +1,5 @@
 import { Form, useLoaderData } from '@remix-run/react'
-import { GrAnnounce } from 'react-icons/gr'
+import { GrAnnounce } from 'react-icons/gr/index.js'
 import * as Sentry from '@sentry/browser'
 import { createPortal } from 'react-dom'
 
