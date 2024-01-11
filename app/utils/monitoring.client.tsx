@@ -18,6 +18,10 @@ export function init() {
 			new Sentry.Feedback({
 				// Additional SDK configuration goes in here, for example:
 				colorScheme: 'dark',
+				formTitle: 'Feedback',
+				messagePlaceholder: 'Tell us your feedback',
+				buttonLabel: 'Feedback',
+				submitButtonLabel: 'Submit',
 			}),
 		],
 		beforeSend(event, hint) {
