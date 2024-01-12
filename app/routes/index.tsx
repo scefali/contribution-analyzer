@@ -67,7 +67,7 @@ function GithubAppInstallationPage() {
           </ul>
           <Link
             to={githubUrl}
-            className="inline-flex items-center justify-center rounded px-4 py-2 font-bold transition-colors duration-300 bg-primary text-primary-foreground hover:bg-primary-dark"
+            className="inline-flex items-center justify-center rounded px-4 py-2 font-bold transition-colors duration-300 bg-primary text-black hover:bg-primary-dark"
           >
             <Github className="mr-2 h-6 w-6" />
             Connect your GitHub Account
