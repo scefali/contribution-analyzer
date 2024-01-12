@@ -41,45 +41,44 @@ export async function loader({ request }: DataFunctionArgs) {
 }
 
 function GithubAppInstallationPage() {
-	const { githubUrl } = useLoaderData()
+  const { githubUrl } = useLoaderData();
 
-	return (
-		<div className="flex min-h-screen flex-col justify-center bg-background text-foreground">
-			<div className="w-full m-auto max-w-md p-4">
-				<div className="rounded-lg bg-card p-6 text-card-foreground shadow-xl">
-					<h1 className="text-4xl mb-4 font-bold">
-						GitHub Contribution Analyzer
-					</h1>
-					<p className="mb-6">
-						Monitor and analyze GitHub contributions for yourself and your team.
-					</p>
-					<h2 className="text-2xl mb-3 font-semibold">Features</h2>
-					<ul className="mb-6 list-inside list-disc">
-						<li>
-							View a summary of GitHub PR contributions for any user in your
-							team.
-						</li>
-						<li>Build your engineering team and monitor their progress.</li>
-						<li>
-							Receive weekly emails summarizing contributions made in the past
-							week.
-						</li>
-					</ul>
-					
-					<Link
-						to={githubUrl}
-						className="hover:bg-primary-dark inline-flex items-center justify-center rounded bg-white px-4 py-2 font-bold text-primary-foreground transition-colors duration-300"
-					>
-						<Github className="w-6 mr-2 h-6" />
-						Connect your GitHub Account
-					</Link>
-				</div>
-				<p className="text-sm mt-6 text-center text-muted-foreground">
-					© 2023 Contribution Analyzer. All rights reserved.
-				</p>
-			</div>
-		</div>
-	)
+  return (
+    <div className="flex min-h-screen flex-col justify-start bg-background text-foreground pt-4">
+      <div className="w-full mx-auto max-w-md px-4">
+        <div className="rounded-lg p-6 shadow-xl bg-card text-card-foreground mt-4">
+          <h1 className="text-4xl mb-4 font-bold">
+            GitHub Contribution Analyzer for Engineers and their Managers
+          </h1>
+          <p className="mb-6">
+            Monitor and analyze GitHub contributions within your team.
+          </p>
+          <h2 className="text-2xl mb-3 font-semibold">Features</h2>
+          <ul className="mb-6 list-inside list-disc">
+            <li>
+              View a summary of GitHub PR contributions for any user in your
+              team.
+            </li>
+            <li>Build your engineering team and monitor their progress.</li>
+            <li>
+              Receive weekly emails summarizing contributions made in the past
+              week.
+            </li>
+          </ul>
+          <Link
+            to={githubUrl}
+            className="inline-flex items-center justify-center rounded px-4 py-2 font-bold transition-colors duration-300 bg-primary text-primary-foreground hover:bg-primary-dark"
+          >
+            <Github className="mr-2 h-6 w-6" />
+            Connect your GitHub Account
+          </Link>
+        </div>
+        <p className="text-sm mt-6 text-center text-muted-foreground">
+          © 2023 Contribution Analyzer. All rights reserved.
+        </p>
+      </div>
+    </div>
+  );
 }
 
-export default GithubAppInstallationPage
+export default GithubAppInstallationPage;
