@@ -56,8 +56,7 @@ function GithubAppInstallationPage() {
           <h2 className="text-2xl mb-3 font-semibold">Features</h2>
           <ul className="mb-6 list-inside list-disc">
             <li>
-              View a summary of GitHub PR contributions for any user in your
-              team.
+              View a summary of GitHub PR contributions for any user.
             </li>
             <li>Build your engineering team and monitor their progress.</li>
             <li>
