@@ -13,7 +13,7 @@ export async function loader({ request }: DataFunctionArgs) {
 	const userId: number = session.get('user-id')
 	if (userId) {
 		try {
-			await getGithubToken(session.get('user-id'))
+			await getGithubToken(userId)
 			// redirect to the app page
 			return redirect('/app/summary')
 		} catch (error: unknown) {
@@ -48,10 +48,10 @@ function GithubAppInstallationPage() {
       <div className="w-full mx-auto max-w-md px-4">
         <div className="rounded-lg p-6 shadow-xl bg-card text-card-foreground mt-4">
           <h1 className="text-4xl mb-4 font-bold">
-            GitHub Contribution Analyzer for Engineers and their Managers
+            GitHub Contribution Analyzer
           </h1>
           <p className="mb-6">
-            Monitor and analyze GitHub contributions within your team.
+            A tool for engineers and their managers to analyze GitHub contributions.
           </p>
           <h2 className="text-2xl mb-3 font-semibold">Features</h2>
           <ul className="mb-6 list-inside list-disc">
