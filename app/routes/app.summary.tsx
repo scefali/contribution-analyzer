@@ -45,7 +45,7 @@ export async function loader({ request }: DataFunctionArgs) {
 	const session = await getSession(request.headers.get('Cookie'))
 	const userId = session.get('user-id')
 	if (!userId) {
-		return redirect('/github/install')
+		return redirect('/')
 	}
 	const user = await prisma.user.findUnique({
 		where: { id: userId },

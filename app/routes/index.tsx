@@ -1,5 +1,85 @@
-import { redirect } from '@remix-run/node'
+import { useLoaderData, Link } from '@remix-run/react'
+import { json, type DataFunctionArgs, redirect } from '@remix-run/node'
+import { Prisma } from '@prisma/client'
+import Github from '~/images/github.tsx'
+import { getSession } from '~/utils/session.server.ts'
+import { getGithubToken } from '~/orm/user.server'
 
-export async function loader() {
-	return redirect('/github/install')
+// Existing loader function...
+
+export async function loader({ request }: DataFunctionArgs) {
+	const urlObj = new URL(request.url)
+	const session = await getSession(request.headers.get('Cookie'))
+	const userId: number = session.get('user-id')
+	if (userId) {
+		try {
+			await getGithubToken(session.get('user-id'))
+			// redirect to the app page
+			return redirect('/app/summary')
+		} catch (error: unknown) {
+			console.log('got error', { error })
+			if (error instanceof Prisma.PrismaClientKnownRequestError) {
+				if (error.code === 'P2025') {
+					session.unset('user-id')
+					session.unset('access-token')
+					session.unset('refresh-token')
+				}
+			}
+		}
+	}
+
+	const redirectUri = `https://${urlObj.host}/github/oauth/callback`
+	console.log({ redirectUri })
+	const githubUrl = new URL('https://github.com/login/oauth/authorize')
+	// TODO: use oktokit to generate this url
+	githubUrl.searchParams.set('client_id', process.env.GITHUB_CLIENT_ID || '')
+	githubUrl.searchParams.set('redirect_uri', redirectUri)
+	githubUrl.searchParams.set('scope', 'repo,issues')
+	return json({
+		githubUrl: githubUrl.toString(),
+	})
 }
+
+function GithubAppInstallationPage() {
+	const { githubUrl } = useLoaderData()
+
+	return (
+		<div className="flex min-h-screen flex-col justify-center bg-background text-foreground">
+			<div className="w-full m-auto max-w-md p-4">
+				<div className="rounded-lg bg-card p-6 text-card-foreground shadow-xl">
+					<h1 className="text-4xl mb-4 font-bold">
+						GitHub Contribution Analyzer
+					</h1>
+					<p className="mb-6">
+						Monitor and analyze GitHub contributions for yourself and your team.
+					</p>
+					<h2 className="text-2xl mb-3 font-semibold">Features</h2>
+					<ul className="mb-6 list-inside list-disc">
+						<li>
+							View a summary of GitHub PR contributions for any user in your
+							team.
+						</li>
+						<li>Build your engineering team and monitor their progress.</li>
+						<li>
+							Receive weekly emails summarizing contributions made in the past
+							week.
+						</li>
+					</ul>
+					
+					<Link
+						to={githubUrl}
+						className="hover:bg-primary-dark inline-flex items-center justify-center rounded bg-white px-4 py-2 font-bold text-primary-foreground transition-colors duration-300"
+					>
+						<Github className="w-6 mr-2 h-6" />
+						Connect your GitHub Account
+					</Link>
+				</div>
+				<p className="text-sm mt-6 text-center text-muted-foreground">
+					© 2023 Contribution Analyzer. All rights reserved.
+				</p>
+			</div>
+		</div>
+	)
+}
+
+export default GithubAppInstallationPage

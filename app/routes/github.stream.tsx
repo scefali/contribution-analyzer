@@ -117,7 +117,7 @@ export async function loader({ request }: DataFunctionArgs) {
 			if (error.code === 'P2025') {
 				return streamResponse(request, {
 					action: 'redirect',
-					url: '/github/install',
+					url: '/',
 				})
 			}
 		}
