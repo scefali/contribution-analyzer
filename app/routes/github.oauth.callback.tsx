@@ -12,13 +12,13 @@ export async function loader({ request }: DataFunctionArgs) {
 	}
 
 	// TODO: better typing
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const tokenResponse: any = await app.createToken({
+		code,
+	})
 	const {
 		authentication: { token, refreshToken, expiresAt },
-	}: {
-		authentication: { token: string; refreshToken: string; expiresAt: string }
-	} = (await app.createToken({
-		code,
-	})) as any
+	} = tokenResponse
 
 	const { data } = await getMyUser({ githubCookie: token })
 
