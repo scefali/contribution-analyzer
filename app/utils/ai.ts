@@ -1,4 +1,4 @@
-import { createSimpleCompletion } from './chatGPT.ts'
+import { createSimpleCompletion } from './llm.ts'
 import type { PullRequest } from './github.ts'
 import { getCache, setCache } from './redis.ts'
 
@@ -45,10 +45,10 @@ export async function generateSummaryForPrs({
 	customPrompt?: string
 	userId: number
 }) {
-	let prDataArray = await Promise.all(prs.map(getPrContentData))
+	const prDataArray = await Promise.all(prs.map(getPrContentData))
 
 	// load all summaries in the cache in parallel
-	let prsToFetch = await Promise.all(
+	const prsToFetch = await Promise.all(
 		prDataArray.map(async pr => {
 			const cached = await getCache(pr.id.toString())
 			if (cached) {
@@ -58,51 +58,28 @@ export async function generateSummaryForPrs({
 		}),
 	)
 
-	const prsWithCachedSummaries = []
-	// iterate through the cached responses that exist and yield them
-	for (const cached of prsToFetch) {
-		// we only want to immediately pre-populate consecutive summaries from the beginning
-		// if we don't, then flickers will happen
-		if (!cached.summary) {
-			break
-		}
-		if (cached.summary) {
-			// remove the item so we don't yield it again
-			prsWithCachedSummaries.push(cached)
-			prsToFetch = prsToFetch.filter(prItem => prItem.id !== cached.id)
-		}
-	}
-
-	// first do all the cached summaries, then the uncached ones
 	return Promise.all(
-		prsWithCachedSummaries
-			.map(async function* (pr) {
-				// yield the metadata then the summary
+		prsToFetch.map(async function* (pr) {
+			// next try to find the cached summary if it exists
+			// this can happen if there are new PRS at the top already
+			if (pr.summary) {
 				yield getMetadataAction(pr)
 				yield generateSummaryAction(pr.summary, pr.id)
-			})
-			.concat(
-				prsToFetch.map(async function* (pr) {
-					// next try to find the cached summary if it exists
-					// this can happen if there are new PRS at the top already
-					if (pr.summary) {
-						yield getMetadataAction(pr)
-						yield generateSummaryAction(pr.summary, pr.id)
-						return
-					}
+				return
+			}
 
-					// load the diff if it's avaialable on-demand
-					let diff = ''
-					if (pr.diffUrl) {
-						const response = await fetch(pr.diffUrl)
-						const diffText = await response.text()
-						diff = diffText.substring(0, MAX_DIFF_LENGTH)
-					}
+			// load the diff if it's avaialable on-demand
+			let diff = ''
+			if (pr.diffUrl) {
+				const response = await fetch(pr.diffUrl)
+				const diffText = await response.text()
+				diff = diffText.substring(0, MAX_DIFF_LENGTH)
+			}
 
-					// TODO: add comment data
+			// TODO: add comment data
 
-					// Construct the prompt for OpenAI
-					const prompt = `
+			// Construct the prompt for OpenAI
+			const prompt = `
 				Create a summary of this PR based on the JSON representation of the PR below.
 				The summary should be 2-3 sentences.
 				${customPrompt || ''}: 
@@ -116,30 +93,29 @@ export async function generateSummaryForPrs({
 					body: pr.body,
 					diff: diff,
 				})}`
-					const generator = createSimpleCompletion(prompt, userId)
+			const generator = createSimpleCompletion(prompt, userId)
 
-					// Generate the summary using OpenAI
-					let summary = ''
+			// Generate the summary using OpenAI
+			let summary = ''
 
-					let first = true
-					while (true) {
-						const newItem = await generator.next()
-						if (newItem.done) {
-							// cache the summary
-							await setCache(pr.id.toString(), summary)
-							return
-						}
-						summary += newItem.value
+			let first = true
+			while (true) {
+				const newItem = await generator.next()
+				if (newItem.done) {
+					// cache the summary
+					await setCache(pr.id.toString(), summary)
+					return
+				}
+				summary += newItem.value
 
-						if (first) {
-							// yield the metadata right before the first stream of data
-							yield getMetadataAction(pr)
-							first = false
-						}
+				if (first) {
+					// yield the metadata right before the first stream of data
+					yield getMetadataAction(pr)
+					first = false
+				}
 
-						yield generateSummaryAction(newItem.value, pr.id)
-					}
-				}),
-			),
+				yield generateSummaryAction(newItem.value, pr.id)
+			}
+		}),
 	)
 }

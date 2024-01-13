@@ -18,7 +18,9 @@ destination = "/data"
 source = "data"
 
 [deploy]
-release_command = "node ./other/sentry-create-release.js"
+    release_command = "node ./other/sentry-create-release.js"
+    strategy = "rolling"
+    max_unavailable = 1
 
 [[services]]
 internal_port = 8080
