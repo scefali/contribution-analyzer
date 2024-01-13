@@ -27,7 +27,10 @@ export function init() {
 		],
 		beforeSend(event, hint) {
 			// Check if it is an exception, and if so, show the report dialog
-			if (event.exception) {
+			if (
+				event.exception &&
+				!event?.exception?.values?.[0]?.value?.includes('AbortError')
+			) {
 				Sentry.showReportDialog({ eventId: event.event_id })
 			}
 			return event
