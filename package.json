@@ -149,11 +149,11 @@
     "vitest": "^0.32.0"
   },
   "engines": {
-    "node": "18"
+    "node": "20"
   },
   "epic-stack": true,
   "volta": {
-    "node": "18.16.1"
+    "node": " 20.11.0"
   },
   "trigger.dev": {
     "endpointId": "contribution-analyzer-Ma7C"
