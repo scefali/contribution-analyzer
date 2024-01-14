@@ -13,7 +13,7 @@ export function loader({ request }: { request: Request }) {
 
 export default function App() {
 	return (
-		<div className="flex flex-col md:flex-row">
+		<div className="flex flex-col md:flex-col">
 			<div className="z-50 sm:items-start	md:items-center ">
 				<Sidebar />
 			</div>

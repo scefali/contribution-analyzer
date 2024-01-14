@@ -1,82 +1,69 @@
-import { useLoaderData, Link } from '@remix-run/react'
-import { json, type DataFunctionArgs, redirect } from '@remix-run/node'
-import { Prisma } from '@prisma/client'
+import { Link } from '@remix-run/react'
 import Github from '~/images/github.tsx'
-import { getSession } from '~/utils/session.server.ts'
-import { getGithubToken } from '~/orm/user.server'
+import logo from '~/images/logo.webp'
 
-// Existing loader function...
-
-export async function loader({ request }: DataFunctionArgs) {
-	const urlObj = new URL(request.url)
-	const session = await getSession(request.headers.get('Cookie'))
-	const userId: number = session.get('user-id')
-	if (userId) {
-		try {
-			await getGithubToken(userId)
-			// redirect to the app page
-			return redirect('/app/summary')
-		} catch (error: unknown) {
-			console.log('got error', { error })
-			if (error instanceof Prisma.PrismaClientKnownRequestError) {
-				if (error.code === 'P2025') {
-					session.unset('user-id')
-					session.unset('access-token')
-					session.unset('refresh-token')
-				}
-			}
-		}
-	}
-
-	const redirectUri = `https://${urlObj.host}/github/oauth/callback`
-	console.log({ redirectUri })
-	const githubUrl = new URL('https://github.com/login/oauth/authorize')
-	// TODO: use oktokit to generate this url
-	githubUrl.searchParams.set('client_id', process.env.GITHUB_CLIENT_ID || '')
-	githubUrl.searchParams.set('redirect_uri', redirectUri)
-	githubUrl.searchParams.set('scope', 'repo,issues')
-	return json({
-		githubUrl: githubUrl.toString(),
-	})
-}
-
-function GithubAppInstallationPage() {
-	const { githubUrl } = useLoaderData<{ githubUrl: string }>()
-
+function LandingPage() {
 	return (
-		<div className="flex min-h-screen flex-col justify-start bg-background pt-4 text-foreground">
-			<div className="w-full mx-auto max-w-md px-4">
-				<div className="mt-4 rounded-lg bg-card p-6 text-card-foreground shadow-xl">
-					<h1 className="text-4xl mb-4 font-bold">
-						GitHub Contribution Analyzer
+		<div className="flex min-h-screen flex-col bg-background text-foreground">
+			<header className="border-b-2 py-4">
+				<nav className="container mx-auto flex items-center justify-between px-4">
+					{/* Logo and title */}
+					<div className="flex items-center">
+						<Link to="/" className="text-2xl font-bold">
+							Contribution Analyzer
+						</Link>
+					</div>
+
+					{/* Navigation links */}
+					<div className="flex items-center">
+						<a
+							href="https://github.com/scefali/contribution-analyzer"
+							className="w-8 ml-4 flex "
+						>
+							<Github className="mr-1" />
+							Source Code
+						</a>
+					</div>
+				</nav>
+			</header>
+
+			<main role="main" className="container mx-auto flex-grow px-4 py-12">
+				<div className="flex flex-col items-center justify-center space-y-6 text-center">
+					<h1 className="text-6xl font-bold">
+						View a summary of GitHub contributions for yourself and your team
 					</h1>
-					<p className="mb-6">
-						A tool for engineers and their managers to analyze GitHub
-						contributions.
-					</p>
-					<h2 className="text-2xl mb-3 font-semibold">Features</h2>
-					<ul className="mb-6 list-inside list-disc">
-						<li>View a summary of GitHub PR contributions for any user.</li>
-						<li>Build your engineering team and monitor their progress.</li>
-						<li>
-							Receive weekly emails summarizing contributions made in the past
-							week.
-						</li>
-					</ul>
 					<Link
-						to={githubUrl}
-						className="hover:bg-primary-dark inline-flex items-center justify-center rounded bg-primary px-4 py-2 font-bold text-black transition-colors duration-300"
+						to="/github/login"
+						className="flex rounded bg-primary px-4 py-2 font-medium text-black"
 					>
-						<Github className="w-6 mr-2 h-6" />
-						Connect your GitHub Account
+						<Github className="mr-1" />
+						Get Started with GitHub
 					</Link>
+					{/* Illustration or logo */}
+					<img
+						className="max-w-md"
+						src={logo}
+						alt="Contribution Analyzer Logo"
+					/>
 				</div>
-				<p className="text-sm mt-6 text-center text-muted-foreground">
-					© 2023 Contribution Analyzer. All rights reserved.
-				</p>
-			</div>
+
+				<div className="mt-12 grid grid-cols-2 gap-12">
+					{/* Feature blocks */}
+					<div>
+						<h3 className="text-3xl font-semibold">Track your contributions</h3>
+						<p>Generate summaries of your merged pull requests</p>
+					</div>
+					<div>
+						<h3 className="text-3xl font-semibold">
+							Track your team's contributions
+						</h3>
+						<p>Build your team and set up weekly reports</p>
+					</div>
+					{/* Add more feature blocks as needed */}
+				</div>
+			</main>
 		</div>
 	)
 }
 
-export default GithubAppInstallationPage
+export default LandingPage

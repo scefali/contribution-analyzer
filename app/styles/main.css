@@ -8,3 +8,10 @@ a.active {
 .markdown-content a:hover {
     color: darkblue; 
 }
+
+/*
+This should come with Tailwind
+*/  
+.w-full {
+    width: 100%;
+}

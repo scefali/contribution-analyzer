@@ -21,6 +21,7 @@ import {
 import GithubContributionSummary from '~/components/github-contribution-summary.tsx'
 import AppLayout from '~/components/app-layout'
 import { prisma } from '~/utils/db.server'
+import { GITHUB_LOGIN_URL } from '~/utils/constants'
 
 type ActionData =
 	| { status: 'error'; message: string }
@@ -45,7 +46,7 @@ export async function loader({ request }: DataFunctionArgs) {
 	const session = await getSession(request.headers.get('Cookie'))
 	const userId = session.get('user-id')
 	if (!userId) {
-		return redirect('/')
+		return redirect(GITHUB_LOGIN_URL)
 	}
 	const user = await prisma.user.findUnique({
 		where: { id: userId },
@@ -63,11 +64,11 @@ export default function Summary() {
 	return (
 		<AppLayout>
 			<Form
-				className="m-auto rounded-sm bg-secondary p-8 "
+				className="m-auto max-w-sm md:max-w-md rounded-sm p-8"
 				action="/app/summary"
 				method="GET"
 			>
-				<h1 className="text-lg font-bold">
+				<h1 className="text-lg font-bold text-center">
 					See a Summary of Github Contributions
 				</h1>
 				<Input
@@ -75,6 +76,7 @@ export default function Summary() {
 					placeholder="GitHub Username"
 					name="userName"
 					required
+					className="w-full max-w-md mx-auto"
 					defaultValue={queryParams.get('userName') || ''}
 				/>
 				<Select
@@ -82,7 +84,7 @@ export default function Summary() {
 					defaultValue={queryParams.get('timePeriod') || ''}
 					required
 				>
-					<SelectTrigger className="mt-4 w-[180px] bg-background ">
+					<SelectTrigger className="mt-4 bg-background w-full max-w-md mx-auto">
 						<SelectValue placeholder="Time Period" />
 					</SelectTrigger>
 					<SelectContent>
@@ -92,17 +94,17 @@ export default function Summary() {
 						<SelectItem value="1y">1 Year</SelectItem>
 					</SelectContent>
 				</Select>
-				<Button type="submit" className="mt-4" disabled={disableButton}>
+				<Button type="submit" className="mt-4 mx-auto" disabled={disableButton}>
 					{submitting && <Loader2 className="animate-spin" />}
 					Submit
 				</Button>
-				{userName && timePeriod && (
-					<GithubContributionSummary
-						userName={userName}
-						timePeriod={timePeriod}
-					/>
-				)}
 			</Form>
+			{userName && timePeriod && (
+				<GithubContributionSummary
+					userName={userName}
+					timePeriod={timePeriod}
+				/>
+			)}
 		</AppLayout>
 	)
 }

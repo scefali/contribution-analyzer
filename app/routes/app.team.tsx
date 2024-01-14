@@ -2,18 +2,15 @@ import {
 	type DataFunctionArgs,
 	type TypedResponse,
 	json,
-	redirect,
 } from '@remix-run/node'
 import { Loader2 } from 'lucide-react'
-import { Fragment, Suspense, useEffect, useState } from 'react'
+import { Fragment } from 'react'
 
 import {
-	Await,
 	Form,
 	useActionData,
 	useNavigation,
 	useLoaderData,
-	useSearchParams,
 	useFetcher,
 } from '@remix-run/react'
 import { Prisma } from '@prisma/client'
@@ -43,13 +40,15 @@ export async function action({
 		)
 	}
 
-
 	const session = await getSession(request.headers.get('Cookie'))
 	const gitHubApiToken = await getGithubToken(session.get('user-id'))
 	const userId: number = session.get('user-id')
 
 	try {
-		const { data: gitHubUser } = await getUser({ userName, githubCookie: gitHubApiToken })
+		const { data: gitHubUser } = await getUser({
+			userName,
+			githubCookie: gitHubApiToken,
+		})
 		await prisma.teamMember.create({
 			data: {
 				name: gitHubUser.name,
@@ -102,7 +101,10 @@ export async function loader({ request }: DataFunctionArgs) {
 
 export default function Team() {
 	const { teamMembers } = useLoaderData<ReturnType<typeof loader>>()
-	const generateReportFetcher = useFetcher()
+	const generateReportFetcher = useFetcher<{
+		status: string
+		message: string
+	}>()
 	const navigation = useNavigation()
 	const actionData = useActionData<ActionData>()
 	return (
