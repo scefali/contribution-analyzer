@@ -14,7 +14,6 @@ export const getGithubToken = async (userId: number) => {
 	})
 	const oneHourFromNow = new Date(new Date().getTime() + 60 * 60 * 1000)
 	if (new Date(gitHubAuth.githubTokenExpiresAt) < oneHourFromNow) {
-		console.log('Updating User')
 		try {
 			const { data } = await app.refreshToken({
 				refreshToken: gitHubAuth.githubRefreshToken,

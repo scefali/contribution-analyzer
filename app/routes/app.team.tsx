@@ -2,6 +2,7 @@ import {
 	type DataFunctionArgs,
 	type TypedResponse,
 	json,
+	redirect,
 } from '@remix-run/node'
 import { Loader2 } from 'lucide-react'
 import { Fragment } from 'react'
@@ -41,10 +42,10 @@ export async function action({
 	}
 
 	const session = await getSession(request.headers.get('Cookie'))
-	const gitHubApiToken = await getGithubToken(session.get('user-id'))
-	const userId: number = session.get('user-id')
 
 	try {
+		const gitHubApiToken = await getGithubToken(session.get('user-id'))
+		const userId: number = session.get('user-id')
 		const { data: gitHubUser } = await getUser({
 			userName,
 			githubCookie: gitHubApiToken,
@@ -62,13 +63,15 @@ export async function action({
 			},
 		})
 	} catch (e: unknown) {
-		console.log(e)
 		if (e instanceof Prisma.PrismaClientKnownRequestError) {
 			if (e.code === 'P2002') {
 				return json(
 					{ status: 'error', message: 'Team member already exists' },
 					{ status: 400 },
 				)
+			}
+			if (e.code === 'P2025') {
+				return redirect('/github/login')
 			}
 		} else if (e instanceof RequestError) {
 			if (e.status === 404) {
@@ -78,6 +81,7 @@ export async function action({
 				)
 			}
 		}
+		console.error(e)
 		return json({ status: 'error', message: 'Unknown error' }, { status: 500 })
 	}
 
