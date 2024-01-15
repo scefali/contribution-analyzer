@@ -2,6 +2,7 @@ import { Link } from '@remix-run/react'
 import Github from '~/images/github.tsx'
 import logo from '~/images/logo.webp'
 
+
 function LandingPage() {
 	return (
 		<div className="flex min-h-screen flex-col bg-background text-foreground">
@@ -33,7 +34,7 @@ function LandingPage() {
 						View a summary of GitHub contributions for yourself and your team
 					</h1>
 					<Link
-						to="/github/login"
+						to="/app/summary"
 						className="flex rounded bg-primary px-4 py-2 font-medium text-black"
 					>
 						<Github className="mr-1" />

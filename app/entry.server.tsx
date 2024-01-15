@@ -1,4 +1,7 @@
-import { type HandleDocumentRequestFunction } from '@remix-run/node'
+import {
+	createCookie,
+	type HandleDocumentRequestFunction,
+} from '@remix-run/node'
 import { RemixServer } from '@remix-run/react'
 import isbot from 'isbot'
 import { getInstanceInfo } from 'litefs-js'
@@ -7,6 +10,7 @@ import { PassThrough } from 'stream'
 import { getEnv, init } from './utils/env.server.ts'
 import { NonceProvider } from './utils/nonce-provider.ts'
 import { Response } from '@remix-run/web-fetch'
+import { cacheHeader } from 'pretty-cache-header'
 
 const ABORT_DELAY = 5000
 
@@ -18,6 +22,13 @@ if (ENV.MODE === 'production' && ENV.SENTRY_DSN) {
 }
 
 type DocRequestArgs = Parameters<HandleDocumentRequestFunction>
+
+let versionCookie = createCookie('version', {
+	path: '/', // make sure the cookie we receive the request on every path
+	secure: false, // enable this in prod
+	httpOnly: true, // only for server-side usage
+	maxAge: 60 * 60 * 24 * 365, // keep the cookie for a year
+})
 
 export default async function handleRequest(...args: DocRequestArgs) {
 	const [
@@ -32,6 +43,28 @@ export default async function handleRequest(...args: DocRequestArgs) {
 	responseHeaders.set('fly-app', process.env.FLY_APP_NAME ?? 'unknown')
 	responseHeaders.set('fly-primary-instance', primaryInstance)
 	responseHeaders.set('fly-instance', currentInstance)
+	const { version } = remixContext.manifest // get the build version
+
+	// if the response doesn't already have a cache-control header, add one
+	if (
+		!responseHeaders.has('cache-control') &&
+		request.method === 'GET' &&
+		request.url !== ''
+	) {
+		responseHeaders.append(
+			'cache-control',
+			cacheHeader({
+				public: true, // cache on CDN
+				maxAge: '60s', // cache time
+				staleWhileRevalidate: '1y', // enables ISR
+				staleIfError: '1y', // enables ISR
+			}),
+		)
+	}
+
+	// Add new headers to the response
+	responseHeaders.append('Vary', 'Cookie')
+	responseHeaders.append('Set-Cookie', await versionCookie.serialize(version))
 
 	const callbackName = isbot(request.headers.get('user-agent'))
 		? 'onAllReady'
