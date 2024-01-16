@@ -3,7 +3,7 @@ import OpenAI from 'openai'
 import { setCache, getCache } from '~/utils/redis.ts'
 import { LLMRateLimitError } from './errors'
 
-const DAILY_RATE_LIMIT = Number(process.env.DAILY_RATE_LIMIT ?? 20)
+const DAILY_RATE_LIMIT = Number(process.env.DAILY_RATE_LIMIT ?? 200)
 
 interface RateLimitCount {
 	timestamp: number

@@ -42,6 +42,7 @@ export async function loader({ request }: DataFunctionArgs) {
 		create: baseUserParams,
 	})
 
+	console.log('upsert')
 	await prisma.gitHubAuth.upsert({
 		where: { userId: user.id },
 		update: baseGitHubParams,

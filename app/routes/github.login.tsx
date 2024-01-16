@@ -17,7 +17,6 @@ export async function loader({ request }: DataFunctionArgs) {
 			// redirect to the app page
 			return redirect('/app/summary')
 		} catch (error: unknown) {
-			console.log('got error', { error })
 			if (error instanceof Prisma.PrismaClientKnownRequestError) {
 				if (error.code === 'P2025') {
 					session.unset('user-id')

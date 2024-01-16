@@ -5,6 +5,7 @@ import { getSession } from '~/utils/session.server.ts'
 import { eventStream } from '~/utils/event-stream.ts'
 import { getGithubToken } from '~/orm/user.server'
 import { Prisma } from '@prisma/client'
+import { GITHUB_LOGIN_URL } from '~/utils/constants'
 
 function streamResponse(
 	request: DataFunctionArgs['request'],
@@ -112,12 +113,13 @@ export async function loader({ request }: DataFunctionArgs) {
 			return () => {}
 		})
 	} catch (error) {
+		console.log('got error', { error })
 		// check if user does not exist
 		if (error instanceof Prisma.PrismaClientKnownRequestError) {
 			if (error.code === 'P2025') {
 				return streamResponse(request, {
 					action: 'redirect',
-					url: '/',
+					url: GITHUB_LOGIN_URL,
 				})
 			}
 		}
