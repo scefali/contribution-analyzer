@@ -79,7 +79,6 @@ export async function* createSimpleCompletion(prompt: string, userId: number) {
 		} else {
 			// Increment count for the day
 			const count = rateLimitCount.count + 1
-			console.log('count', count)
 			await setCache(
 				rateLimitKey,
 				JSON.stringify({ timestamp: currentTimestamp, count }),

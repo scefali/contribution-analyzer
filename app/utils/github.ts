@@ -53,37 +53,33 @@ export const getPrsForSummary = async ({
 			throw new Error('Invalid time period')
 	}
 
-	const query = `is:pull-request+is:merged+author:${userName}`
+	const query = `is:pull-request+is:merged+author:${userName}+closed:>${cutoffDate.toISOString()}`
 	// TODO: use Github client to fetch PRs
-	const response = await fetch(
-		`https://api.github.com/search/issues?q=${query}`,
-		{
-			headers: {
-				Authorization: `token ${githubCookie}`,
+	// Implementing pagination and iterating through each page until there are no more pages
+	let prs: SearchIssuesResponseType['data']['items'] = []
+	let page = 1
+	let hasMorePages = true
+	while (hasMorePages) {
+		const response = await fetch(
+			`https://api.github.com/search/issues?q=${query}&per_page=100&page=${page}`,
+			{
+				headers: {
+					Authorization: `token ${githubCookie}`,
+				},
 			},
-		},
-	)
-	const output = (await response.json()) as SearchIssuesResponseType['data']
-	if (!output.items) {
+		)
+		const output = (await response.json()) as SearchIssuesResponseType['data']
+		console.log(output.total_count, output.items?.length)
+		if (!output.items.length) {
+			hasMorePages = false
+		} else {
+			prs = prs.concat(...output.items)
+			page++
+		}
+	}
+	if (!prs.length) {
 		return []
 	}
-	// filter out PRs that are older than startDate
-	const prs = output.items
-		.filter(pr => {
-			if (!pr.closed_at) {
-				return false
-			}
-			const prDate = new Date(pr.closed_at)
-			return prDate >= cutoffDate
-		})
-		.sort((a, b) => {
-			if (!a.closed_at || !b.closed_at) {
-				return 0
-			}
-			const dateA = new Date(a.closed_at);
-			const dateB = new Date(b.closed_at);
-			return dateB.getTime() - dateA.getTime();
-		})
 	return prs
 }
 
