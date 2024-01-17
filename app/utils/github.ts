@@ -79,7 +79,11 @@ export const getPrsForSummary = async ({
 	if (!prs.length) {
 		return []
 	}
-	return prs
+	return prs.sort((a, b) => {
+		const aDate = new Date(a.closed_at ?? '')
+		const bDate = new Date(b.closed_at ?? '')
+		return bDate.getTime() - aDate.getTime()
+	})
 }
 
 export const generateSummary = async ({
