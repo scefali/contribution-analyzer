@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import Markdown from 'react-markdown'
 
 import { useBufferedEventSource } from '~/utils/use-buffered-event-source.ts'
-import { type StreamData } from '~/utils/types.tsx'
+import { type ProcessedPrData, type StreamData } from '~/utils/types.tsx'
 
 interface Props {
 	userName: string
@@ -24,15 +24,7 @@ function GithubContributionSummary({ userName, timePeriod }: Props) {
 		},
 	)
 
-	const [prs, setPrs] = useState<
-		{
-			id: number
-			title: string
-			link: string
-			summary: string
-			closedAt: string
-		}[]
-	>([])
+	const [prs, setPrs] = useState<ProcessedPrData[]>([])
 	useEffect(() => {
 		// set up the metadata
 		streamArray.forEach(stream => {
@@ -46,8 +38,8 @@ function GithubContributionSummary({ userName, timePeriod }: Props) {
 						return [
 							...prevPrs,
 							{
-								summary: '',
 								...stream.data,
+								summary: '',
 							},
 						]
 					}
@@ -105,8 +97,16 @@ function GithubContributionSummary({ userName, timePeriod }: Props) {
 		if (prs.length) {
 			return prs.map(pr => (
 				<div key={pr.id}>
-					<div className="flex gap-2">
+					<div className="flex flex-col md:flex-row md:gap-2">
 						{new Date(pr.closedAt).toLocaleDateString()}:
+						<a
+							href={pr.repoLink}
+							className="text-blue-500 underline"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							{pr.repo}
+						</a>
 						<a
 							className="text-blue-500 underline"
 							href={pr.link}

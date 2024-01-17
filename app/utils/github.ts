@@ -69,7 +69,6 @@ export const getPrsForSummary = async ({
 			},
 		)
 		const output = (await response.json()) as SearchIssuesResponseType['data']
-		console.log(output.total_count, output.items?.length)
 		if (!output.items.length) {
 			hasMorePages = false
 		} else {

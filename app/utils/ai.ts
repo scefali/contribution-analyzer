@@ -4,15 +4,14 @@ import { getCache, setCache } from './redis.ts'
 
 const MAX_DIFF_LENGTH = 1000
 
+function getRepoFromPr(pr: PullRequest) {
+	return `${pr.repository_url.split('/').slice(-2).join('/')}`
+}
+
 function getMetadataAction(pr: ReturnType<typeof getPrContentData>) {
 	return {
 		action: 'metadata',
-		data: {
-			title: pr.title,
-			link: pr.link,
-			id: pr.id,
-			closedAt: pr.closedAt,
-		},
+		data: pr,
 	} as const
 }
 
@@ -31,6 +30,8 @@ function getPrContentData(pr: PullRequest) {
 		id: pr.id,
 		diffUrl: pr?.pull_request?.diff_url,
 		closedAt: pr.closed_at as string, // we've already filtered out PRs that are open
+		repo: getRepoFromPr(pr),
+		repoLink: pr.repository_url,
 	}
 }
 

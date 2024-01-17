@@ -8,12 +8,7 @@ export type User = Prisma.PromiseReturnType<PrismaClient['user']['create']>
 
 export type MetadataAction = {
 	action: 'metadata'
-	data: {
-		title: string
-		link: string
-		id: number
-		closedAt: string
-	}
+	data: ProcessedPrData
 }
 
 export type SummaryAction = {
@@ -47,4 +42,6 @@ export type ProcessedPrData = {
 	id: number
 	closedAt: string
 	summary: string
+	repo: string
+	repoLink: string
 }
