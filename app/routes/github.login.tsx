@@ -1,5 +1,5 @@
 import { useLoaderData, Link } from '@remix-run/react'
-import { json, type DataFunctionArgs, redirect } from '@remix-run/node'
+import { json, type LoaderFunctionArgs, redirect } from '@remix-run/node'
 import { Prisma } from '@prisma/client'
 import Github from '~/images/github.tsx'
 import { getSession } from '~/utils/session.server.ts'
@@ -7,7 +7,7 @@ import { getGithubToken } from '~/orm/user.server'
 
 // Existing loader function...
 
-export async function loader({ request }: DataFunctionArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
 	const urlObj = new URL(request.url)
 	const session = await getSession(request.headers.get('Cookie'))
 	const userId: number = session.get('user-id')
@@ -28,7 +28,6 @@ export async function loader({ request }: DataFunctionArgs) {
 	}
 
 	const redirectUri = `https://${urlObj.host}/github/oauth/callback`
-	console.log({ redirectUri })
 	const githubUrl = new URL('https://github.com/login/oauth/authorize')
 	// TODO: use oktokit to generate this url
 	githubUrl.searchParams.set('client_id', process.env.GITHUB_CLIENT_ID || '')

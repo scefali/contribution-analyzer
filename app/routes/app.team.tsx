@@ -25,6 +25,8 @@ import { prisma } from '~/utils/db.server.ts'
 import MemberItem from '~/components/member-item.tsx'
 import AppLayout from '~/components/app-layout'
 import { getGithubToken } from '~/orm/user.server'
+import { GITHUB_LOGIN_URL } from '~/utils/constants'
+import { BadRefreshTokenError } from '~/utils/errors'
 
 type ActionData = { status: 'error'; message: string } | { status: 'success' }
 
@@ -63,7 +65,9 @@ export async function action({
 			},
 		})
 	} catch (e: unknown) {
-		if (e instanceof Prisma.PrismaClientKnownRequestError) {
+		if (e instanceof BadRefreshTokenError) {
+			return redirect(GITHUB_LOGIN_URL)
+		} else if (e instanceof Prisma.PrismaClientKnownRequestError) {
 			if (e.code === 'P2002') {
 				return json(
 					{ status: 'error', message: 'Team member already exists' },
@@ -71,7 +75,7 @@ export async function action({
 				)
 			}
 			if (e.code === 'P2025') {
-				return redirect('/github/login')
+				return redirect(GITHUB_LOGIN_URL)
 			}
 		} else if (e instanceof RequestError) {
 			if (e.status === 404) {
