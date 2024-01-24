@@ -1,5 +1,5 @@
 import {
-	type DataFunctionArgs,
+	type ActionFunctionArgs,
 	type TypedResponse,
 	json,
 } from '@remix-run/node'
@@ -18,7 +18,7 @@ interface ActionData {
 
 export async function action({
 	request,
-}: DataFunctionArgs): Promise<TypedResponse<ActionData>> {
+}: ActionFunctionArgs): Promise<TypedResponse<ActionData>> {
 	const session = await getSession(request.headers.get('Cookie'))
 	const userId: number = session.get('user-id')
 	const user = await prisma.user.findUnique({

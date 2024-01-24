@@ -1,11 +1,12 @@
 import {
-	type DataFunctionArgs,
+	type ActionFunctionArgs,
+	type LoaderFunctionArgs,
 	type TypedResponse,
 	json,
 	redirect,
 } from '@remix-run/node'
 import { Loader2 } from 'lucide-react'
-import { Fragment } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 
 import {
 	Form,
@@ -32,7 +33,7 @@ type ActionData = { status: 'error'; message: string } | { status: 'success' }
 
 export async function action({
 	request,
-}: DataFunctionArgs): Promise<TypedResponse<ActionData>> {
+}: ActionFunctionArgs): Promise<TypedResponse<ActionData>> {
 	const formData = await request.formData()
 	const userName = formData.get('userName')
 
@@ -88,11 +89,10 @@ export async function action({
 		console.error(e)
 		return json({ status: 'error', message: 'Unknown error' }, { status: 500 })
 	}
-
 	return json({ status: 'success' })
 }
 
-export async function loader({ request }: DataFunctionArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
 	const session = await getSession(request.headers.get('Cookie'))
 	const userId: number = session.get('user-id')
 
@@ -115,76 +115,89 @@ export default function Team() {
 	}>()
 	const navigation = useNavigation()
 	const actionData = useActionData<ActionData>()
+	const [showSuccessMessage, setShowSuccessMessage] = useState(false)
+
+	useEffect(() => {
+		if (generateReportFetcher.data?.status === 'success') {
+			setShowSuccessMessage(true)
+			const timer = setTimeout(() => setShowSuccessMessage(false), 3000)
+			return () => clearTimeout(timer)
+		}
+	}, [generateReportFetcher.data])
+
 	return (
 		<AppLayout>
-			<Form
-				className="m-auto rounded-sm bg-secondary p-8"
-				// eslint-disable-next-line remix-react-routes/require-valid-paths
-				action="/app/team"
-				method="POST"
-			>
-				<h1 className="text-lg font-bold">Add a GitHub User to Team</h1>
-				<Input
-					type="text"
-					placeholder="GitHub Username"
-					className="mt-4 max-w-md"
-					required
-					name="userName"
-				/>
-				<Button
-					type="submit"
-					className="mt-4"
-					disabled={navigation.state === 'submitting'}
-					variant="white"
-				>
-					{navigation.state === 'submitting' && (
-						<Loader2 className="animate-spin" />
+			<div className="m-auto flex min-h-screen	max-w-3xl flex-col p-4">
+				<Form className="w-full max-w-md" action="/app/team" method="POST">
+					<h1 className="text-lg text-center font-bold">
+						Add a GitHub User to Team
+					</h1>
+					<Input
+						type="text"
+						placeholder="GitHub Username"
+						className="mt-4 max-w-md"
+						required
+						name="userName"
+					/>
+					<div>
+						<Button
+							type="submit"
+							className="mt-4"
+							disabled={navigation.state === 'submitting'}
+							variant="white"
+						>
+							{navigation.state === 'submitting' && (
+								<Loader2 className="animate-spin" />
+							)}
+							Add to Team
+						</Button>
+					</div>
+					{actionData && actionData.status === 'error' && (
+						<div className="mt-4 text-red-500">{actionData.message}</div>
 					)}
-					Add to Team
-				</Button>
-				{actionData && actionData.status === 'error' && (
-					<div className="mt-4 text-red-500">{actionData.message}</div>
-				)}
-			</Form>
-			<generateReportFetcher.Form
-				method="POST"
-				action="/app/team/generate-report"
-			>
-				<Button
-					type="submit"
-					className="mt-4"
-					disabled={generateReportFetcher.state === 'submitting'}
-					variant="white"
+				</Form>
+				<generateReportFetcher.Form
+					method="POST"
+					action="/app/team/generate-report"
+					className="w-full mt-4 max-w-md" // Apply the same max-width as the form above for alignment
 				>
-					{generateReportFetcher.state === 'submitting' && (
-						<Loader2 className="animate-spin" />
+					<Button
+						type="submit"
+						className="mt-4"
+						disabled={generateReportFetcher.state === 'submitting'}
+						variant="white"
+					>
+						{generateReportFetcher.state === 'submitting' && (
+							<Loader2 className="animate-spin" />
+						)}
+						Generate Weekly Report
+					</Button>
+					<div className="mt-2">
+						Emails you the weekly report for all team members.
+					</div>
+				</generateReportFetcher.Form>
+				{generateReportFetcher.data &&
+					generateReportFetcher.data.status === 'error' && (
+						<div className="mt-4 text-red-500">
+							{generateReportFetcher.data.message}
+						</div>
 					)}
-					Generate Weekly Report
-				</Button>
-				<div className="mt-2">
-					Emails you the weekly report for all team members.
-				</div>
-			</generateReportFetcher.Form>
-			{generateReportFetcher.data &&
-				generateReportFetcher.data.status === 'error' && (
-					<div className="mt-4 text-red-500">
-						{generateReportFetcher.data.message}
-					</div>
-				)}
-			{teamMembers.length > 0 ? (
-				<Fragment>
-					<br />
-					<div className="flex justify-between rounded-sm rounded-b-none bg-secondary p-2">
-						<div>Member</div>
-						<div>Actions</div>
-					</div>
-					<div className="border-x-2 border-t-2">
-						{teamMembers.map((teamMember, index) => (
-							<MemberItem key={index} teamMember={teamMember} />
-						))}
-					</div>
-				</Fragment>
-			) : null}
+				{showSuccessMessage && <div className="text-green-500">Email Sent</div>}
+				{teamMembers.length > 0 ? (
+					<Fragment>
+						<br />
+						<div className="flex justify-between rounded-sm rounded-b-none bg-secondary p-2">
+							<div>Member</div>
+							<div>Delete</div>
+						</div>
+						<div className="border-x-2 border-t-2">
+							{teamMembers.map((teamMember, index) => (
+								<MemberItem key={index} teamMember={teamMember} />
+							))}
+						</div>
+					</Fragment>
+				) : null}
+			</div>
 		</AppLayout>
 	)
 }

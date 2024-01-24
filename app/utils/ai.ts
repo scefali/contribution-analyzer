@@ -32,7 +32,7 @@ function getPrContentData(pr: PullRequest) {
 		diffUrl: pr?.pull_request?.diff_url,
 		closedAt: pr.closed_at as string, // we've already filtered out PRs that are open
 		repo: getRepoFromPr(pr),
-		repoLink: pr.repository_url,
+		repoLink: pr.repository_url.replace('api.github.com/repos', 'github.com'),
 		prNumber: pr.number,
 	}
 }
@@ -79,21 +79,6 @@ export async function generateSummaryForPrs({
 				const response = await fetch(pr.diffUrl)
 				const diffText = await response.text()
 				diff = diffText.substring(0, MAX_DIFF_LENGTH)
-			}
-			const [owner, repo] = pr.repo.split('/')
-			console.log({ owner, repo })
-			let commentText = ''
-			try {
-				const comments = await getCommentsforPr({
-					githubCookie,
-					repo,
-					owner,
-					prNumber: pr.prNumber,
-				})
-
-				console.log({ comments })
-			} catch (err) {
-				console.error('Could not get comments for PR', err)
 			}
 
 			// Construct the prompt for OpenAI

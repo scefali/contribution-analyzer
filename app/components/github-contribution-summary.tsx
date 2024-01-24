@@ -4,6 +4,7 @@ import Markdown from 'react-markdown'
 
 import { useBufferedEventSource } from '~/utils/use-buffered-event-source.ts'
 import { type ProcessedPrData, type StreamData } from '~/utils/types.tsx'
+import { Spinner } from './spinner'
 
 interface Props {
 	userName: string
@@ -91,8 +92,13 @@ function GithubContributionSummary({ userName, timePeriod }: Props) {
 	}, [navigation.state])
 
 	const renderContent = () => {
-		if (!setPrs.length && !error) {
-			return <p className="text-left">Loading...</p>
+		// TODO: prevent spinner from showing during page navigations to another page
+		if (!prs.length && !error) {
+			return (
+				<div className="flex justify-center">
+					<Spinner showSpinner />
+				</div>
+			)
 		}
 		if (prs.length) {
 			return prs.map(pr => (
