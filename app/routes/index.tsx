@@ -1,4 +1,4 @@
-import { Link } from '@remix-run/react'
+import { NavLink } from '@remix-run/react'
 import Github from '~/images/github.tsx'
 import logo from '~/images/logo.webp'
 
@@ -10,18 +10,17 @@ function LandingPage() {
 				<nav className="container mx-auto flex items-center justify-between px-4">
 					{/* Logo and title */}
 					<div className="flex items-center">
-						<Link to="/" className="text-2xl font-bold">
+						<NavLink to="/" className="text-2xl font-bold">
 							Contribution Analyzer
-						</Link>
+						</NavLink>
 					</div>
 
-					{/* Navigation links */}
 					<div className="flex items-center">
 						<a
 							href="https://github.com/scefali/contribution-analyzer"
 							className="w-8 ml-4 flex "
 						>
-							<Github className="mr-1" />
+							<Github className="mr-1 my-auto" />
 							Source Code
 						</a>
 					</div>
@@ -33,14 +32,13 @@ function LandingPage() {
 					<h1 className="text-6xl font-bold">
 						View a summary of GitHub contributions for yourself and your team
 					</h1>
-					<Link
+					<NavLink
 						to="/app/summary"
 						className="flex rounded bg-primary px-4 py-2 font-medium text-black"
 					>
 						<Github className="mr-1" />
 						Get Started with GitHub
-					</Link>
-					{/* Illustration or logo */}
+					</NavLink>
 					<img
 						className="max-w-md"
 						src={logo}
