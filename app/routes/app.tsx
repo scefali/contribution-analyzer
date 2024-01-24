@@ -15,7 +15,7 @@ export default function App() {
 	return (
 		<div className="flex flex-col md:flex-col">
 			<div className="z-50 sm:items-start	md:items-center ">
-				<Sidebar />
+				<Sidebar inApp />
 			</div>
 			<div className="mt-6 md:mt-0" style={{ width: '100%' }}>
 				<Outlet />
