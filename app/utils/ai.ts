@@ -1,5 +1,5 @@
 import { createSimpleCompletion } from './llm.ts'
-import type { PullRequest } from './github.ts'
+import { getCommentsforPr, type PullRequest } from './github.ts'
 import { getCache, setCache } from './redis.ts'
 
 const MAX_DIFF_LENGTH = 1000
@@ -23,6 +23,7 @@ function generateSummaryAction(summary: string, id: number) {
 }
 
 function getPrContentData(pr: PullRequest) {
+	console.log('Getting PR content data for', pr)
 	return {
 		title: pr.title,
 		body: pr.body,
@@ -32,6 +33,7 @@ function getPrContentData(pr: PullRequest) {
 		closedAt: pr.closed_at as string, // we've already filtered out PRs that are open
 		repo: getRepoFromPr(pr),
 		repoLink: pr.repository_url,
+		prNumber: pr.number,
 	}
 }
 
@@ -40,11 +42,13 @@ export async function generateSummaryForPrs({
 	prs,
 	customPrompt,
 	userId,
+	githubCookie,
 }: {
 	prs: PullRequest[]
 	name: string
 	customPrompt?: string
 	userId: number
+	githubCookie: string
 }) {
 	const prDataArray = await Promise.all(prs.map(getPrContentData))
 
@@ -76,8 +80,21 @@ export async function generateSummaryForPrs({
 				const diffText = await response.text()
 				diff = diffText.substring(0, MAX_DIFF_LENGTH)
 			}
+			const [owner, repo] = pr.repo.split('/')
+			console.log({ owner, repo })
+			let commentText = ''
+			try {
+				const comments = await getCommentsforPr({
+					githubCookie,
+					repo,
+					owner,
+					prNumber: pr.prNumber,
+				})
 
-			// TODO: add comment data
+				console.log({ comments })
+			} catch (err) {
+				console.error('Could not get comments for PR', err)
+			}
 
 			// Construct the prompt for OpenAI
 			const prompt = `

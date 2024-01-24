@@ -102,7 +102,7 @@ export const generateSummary = async ({
 	customPrompt?: string
 }) => {
 	const prs = await getPrsForSummary({ userName, githubCookie, timePeriod })
-	return generateSummaryForPrs({ prs, name, customPrompt, userId })
+	return generateSummaryForPrs({ prs, name, customPrompt, githubCookie, userId })
 }
 
 export const getUser = async ({
@@ -119,4 +119,23 @@ export const getUser = async ({
 export const getMyUser = async ({ githubCookie }: { githubCookie: string }) => {
 	const client = getClient(githubCookie)
 	return client.rest.users.getAuthenticated()
+}
+
+export const getCommentsforPr = async ({
+	githubCookie,
+	repo,
+	owner,
+	prNumber,
+}: {
+	githubCookie: string
+	repo: string
+	owner: string
+	prNumber: number
+}) => {
+	const client = getClient(githubCookie)
+	return client.rest.issues.listComments({
+		owner,
+		repo,
+		issue_number: prNumber,
+	})
 }
