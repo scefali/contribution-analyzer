@@ -34,9 +34,9 @@ function LandingPage() {
 					</h1>
 					<NavLink
 						to="/app/summary"
-						className="flex rounded bg-primary px-4 py-2 font-medium text-black"
+						className="flex rounded bg-primary px-4 py-2 font-medium"
 					>
-						<Github className="mr-1" />
+						<Github className="mr-1 my-auto" />
 						Get Started with GitHub
 					</NavLink>
 					<img

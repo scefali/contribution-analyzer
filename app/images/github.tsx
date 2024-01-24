@@ -1,11 +1,17 @@
-export default function Github({ className }: { className?: string }) {
+export default function Github({
+	className,
+	width,
+}: {
+	className?: string
+	width?: number
+}) {
 	return (
 		<svg
-			height="16"
+			height={width ?? 16}
 			aria-hidden="true"
 			viewBox="0 0 16 16"
 			version="1.1"
-			width="16"
+			width={width ?? 16}
 			data-view-component="true"
 			style={{ fill: 'currentColor' }}
 			className={className}
