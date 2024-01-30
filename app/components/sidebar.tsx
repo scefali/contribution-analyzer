@@ -16,14 +16,20 @@ export default function Sidebar({ inApp }: { inApp?: boolean }) {
 				<div className="flex justify-end gap-2">
 					{inApp && (
 						<Fragment>
-							<NavLink to="/app/summary" className="text-4xl flex font-bold">
-								<div className="m-auto mr-1">
+							<NavLink
+								to="/app/summary"
+								className="text-4xl flex flex-col  font-bold md:flex-row"
+							>
+								<div className="m-auto md:mr-1">
 									<FaFileCode />
 								</div>
 								Summary
 							</NavLink>
-							<NavLink to="/app/team" className="text-4xl flex font-bold">
-								<div className="m-auto mr-1">
+							<NavLink
+								to="/app/team"
+								className="text-4xl flex flex-col font-bold md:flex-row"
+							>
+								<div className="m-auto md:mr-1">
 									<FaUsers />
 								</div>
 								Team
@@ -33,10 +39,10 @@ export default function Sidebar({ inApp }: { inApp?: boolean }) {
 					<div className="flex items-center">
 						<a
 							href="https://github.com/scefali/contribution-analyzer"
-							className="w-8 flex "
+							className="text-4xl w-8 flex flex-col md:flex-row"
 						>
-							<Github className="my-auto mr-1" />
-							Source Code
+							<Github className="m-auto md:mr-1" />
+							Source
 						</a>
 					</div>
 				</div>

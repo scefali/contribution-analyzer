@@ -1,6 +1,6 @@
 import { NavLink } from '@remix-run/react'
 import Github from '~/images/github.tsx'
-import logo from '~/images/logo.webp'
+import logo from '~/images/logo_380x380.webp'
 
 
 function LandingPage() {
