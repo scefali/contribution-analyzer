@@ -40,7 +40,7 @@ function LandingPage() {
 						Get Started with GitHub
 					</NavLink>
 					<img
-						className="max-w-md"
+						className="max-w-md h-60 md:h-96"
 						src={logo}
 						alt="Contribution Analyzer Logo"
 					/>
