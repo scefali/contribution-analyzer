@@ -1,3 +1,5 @@
+
+import { Prisma } from '@prisma/client'
 import {
 	type ActionFunctionArgs,
 	type LoaderFunctionArgs,
@@ -5,9 +7,6 @@ import {
 	json,
 	redirect,
 } from '@remix-run/node'
-import { Loader2 } from 'lucide-react'
-import { Fragment, useEffect, useState } from 'react'
-
 import {
 	Form,
 	useActionData,
@@ -15,18 +14,19 @@ import {
 	useLoaderData,
 	useFetcher,
 } from '@remix-run/react'
-import { Prisma } from '@prisma/client'
+import { Loader2 } from 'lucide-react'
+import { Fragment, useEffect, useState } from 'react'
 
-import { getUser } from '#app/utils/github.ts'
-import { getSession } from '#app/utils/session.server.ts'
-import { Input } from '#app/@/components/ui/input.tsx'
 import { Button } from '#app/@/components/ui/button.tsx'
-import { prisma } from '#app/utils/db.server.ts'
-import MemberItem from '#app/components/member-item.tsx'
+import { Input } from '#app/@/components/ui/input.tsx'
 import AppLayout from '#app/components/app-layout'
+import MemberItem from '#app/components/member-item.tsx'
 import { getGithubToken } from '#app/orm/user.server'
 import { GITHUB_LOGIN_URL } from '#app/utils/constants'
+import { prisma } from '#app/utils/db.server.ts'
 import { BadRefreshTokenError } from '#app/utils/errors'
+import { getUser } from '#app/utils/github.ts'
+import { getSession } from '#app/utils/session.server.ts'
 
 type ActionData = { status: 'error'; message: string } | { status: 'success' }
 

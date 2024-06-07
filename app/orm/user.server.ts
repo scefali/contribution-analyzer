@@ -1,6 +1,5 @@
 
 import { prisma } from '#app/utils/db.server.ts'
-import { BadRefreshTokenError } from '#app/utils/errors.tsx'
 
 export const getGithubToken = async (userId: number) => {
 	let gitHubAuth;
