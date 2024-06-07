@@ -1,5 +1,5 @@
+import { type PullRequest } from './github.ts'
 import { createSimpleCompletion } from './llm.ts'
-import { getCommentsforPr, type PullRequest } from './github.ts'
 import { getCache, setCache } from './redis.ts'
 
 const MAX_DIFF_LENGTH = 1000
