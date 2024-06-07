@@ -1,0 +1,20 @@
+a.active {
+	text-decoration: underline;
+}
+
+.markdown-content a {
+	color: #3b82f6;
+}
+.markdown-content a:hover {
+	color: darkblue;
+}
+
+/*
+This should come with Tailwind
+*/
+.w-full {
+	width: 100%;
+}
+.max-w-xl {
+	max-width: 36rem; /* 576px */
+}

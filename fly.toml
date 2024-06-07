@@ -1,4 +1,4 @@
-app = "contribution-analyzer-78e5"
+app = "contribution-analyzer"
 primary_region = "sjc"
 kill_signal = "SIGINT"
 kill_timeout = 5

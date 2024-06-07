@@ -3,78 +3,54 @@
 @tailwind utilities;
 
 @layer base {
-	:root {
-		/* --font-sans: here if you have one */
-		/* --font-mono: here if you got it... */
+  :root {
+    --background: 249, 25%, 20%; /* Dark purple */
+    --foreground: 0, 0%, 100%; /* White */
 
-		/* prefixed with foreground because it should look good on the background */
-		--foreground-destructive: 345 82.7% 40.8%;
+    --muted: 249, 20%, 30%; /* Darker purple */
+    --muted-foreground: 0, 0%, 80%; /* Light gray */
 
-		--background: 0 0% 100%;
-		--foreground: 222.2 84% 4.9%;
+    --popover: 249, 25%, 22%; /* Slightly darker than background */
+    --popover-foreground: 0, 0%, 90%; /* Slightly lighter than foreground */
 
-		--muted: 210 40% 93%;
-		--muted-foreground: 215.4 16.3% 30%;
+    --card: 249, 25%, 25%; /* Dark purple for card background */
+    --card-foreground: 0, 0%, 85%; /* Light gray for card text */
 
-		--popover: 0 0% 100%;
-		--popover-foreground: 222.2 84% 4.9%;
+    --border: 249, 25%, 30%; /* Dark purple border */
+    --input: 249, 25%, 30%; /* Same as border */
 
-		--card: 0 0% 100%;
-		--card-foreground: 222.2 84% 4.9%;
+    --primary: 249, 50%, 40%; /* Purple */
+    --primary-foreground: 0, 0%, 100%; /* White text on primary */
 
-		--border: 214.3 31.8% 91.4%;
-		--input: 214.3 31.8% 91.4%;
-		--input-invalid: 0 84.2% 60.2%;
+    --secondary: 249, 30%, 35%; /* Darker purple */
+    --secondary-foreground: 0, 0%, 70%; /* Light gray on secondary */
 
-		--primary: 222.2 47.4% 11.2%;
-		--primary-foreground: 210 40% 98%;
+    --accent: 249, 40%, 50%; /* Lighter purple for accents */
+    --accent-foreground: 0, 0%, 100%; /* White text on accent */
 
-		--secondary: 210 20% 83%;
-		--secondary-foreground: 222.2 47.4% 11.2%;
+    --destructive: 345, 80%, 65%; /* A shade of red for destructive actions */
+    --destructive-foreground: 0, 0%, 100%; /* White for visibility on red */
 
-		--accent: 210 40% 90%;
-		--accent-foreground: 222.2 47.4% 11.2%;
+    --ring: 249, 50%, 40%; /* Purple ring for focus */
 
-		--destructive: 0 70% 50%;
-		--destructive-foreground: 210 40% 98%;
+    --radius: 0.5rem;
+  }
 
-		--ring: 215 20.2% 65.1%;
+  .dark {
+    /* Adjustments for dark mode, if applicable */
+    --background: 249, 20%, 15%; /* Darker purple for dark mode */
+    --foreground: 0, 0%, 95%; /* Near-white text in dark mode */
 
-		--radius: 0.5rem;
-	}
+    /* ... */
+    /* Rest of the dark mode variables, adjust the hues and lightness to match the theme */
+    /* ... */
+  }
 
-	.dark {
-		--background: 222.2 84% 4.9%;
-		--foreground: 210 40% 98%;
-
-		/* prefixed with foreground because it should look good on the background */
-		--foreground-destructive: -4 84% 60%;
-
-		--muted: 217.2 32.6% 12%;
-		--muted-foreground: 215 20.2% 65.1%;
-
-		--popover: 222.2 84% 4.9%;
-		--popover-foreground: 210 40% 98%;
-
-		--card: 222.2 84% 4.9%;
-		--card-foreground: 210 40% 98%;
-
-		--border: 217.2 32.6% 17.5%;
-		--input: 217.2 32.6% 17.5%;
-		--input-invalid: 0 62.8% 30.6%;
-
-		--primary: 210 40% 98%;
-		--primary-foreground: 222.2 47.4% 11.2%;
-
-		--secondary: 217.2 20% 24%;
-		--secondary-foreground: 210 40% 98%;
-
-		--accent: 217.2 32.6% 10%;
-		--accent-foreground: 210 40% 98%;
-
-		--destructive: 0 60% 40%;
-		--destructive-foreground: 0 85.7% 97.3%;
-
-		--ring: 217.2 32.6% 60%;
-	}
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+  }
 }

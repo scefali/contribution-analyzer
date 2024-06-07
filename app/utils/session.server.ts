@@ -36,3 +36,5 @@ Object.defineProperty(authSessionStorage, 'commitSession', {
 		return setCookieHeader
 	},
 })
+
+export const { getSession, commitSession, destroySession } = authSessionStorage

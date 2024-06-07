@@ -1,0 +1,1 @@
+export const GITHUB_LOGIN_URL = '/github/login'
