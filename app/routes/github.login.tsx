@@ -70,7 +70,7 @@ function GithubAppInstallationPage() {
 					</Link>
 				</div>
 				<p className="text-sm mt-6 text-center text-muted-foreground">
-					© 2023 Contribution Analyzer. All rights reserved.
+					© 2024 Contribution Analyzer. All rights reserved.
 				</p>
 			</div>
 		</div>

@@ -1,32 +1,32 @@
 fuse:
-  dir: '${LITEFS_DIR}'
+  dir: '${LITEFS_DIR}'  # Ensure this is set and accessible
 
 data:
-  dir: '/data/litefs'
+  dir: '/data/litefs'  # Ensure this directory exists
 
 proxy:
-  addr: ':${INTERNAL_PORT}'
-  target: 'localhost:${PORT}'
-  db: '${DATABASE_FILENAME}'
+  addr: ':${INTERNAL_PORT}'  # Ensure this matches your internal port configuration
+  target: 'localhost:${PORT}'  # Ensure this points to your application's port
+  db: '${DATABASE_FILENAME}'  # Ensure this is correctly set
 
 lease:
   type: 'consul'
-  candidate: ${FLY_REGION == PRIMARY_REGION}
+  candidate: ${FLY_REGION == PRIMARY_REGION}  # Ensure this logic is correct
   promote: true
-  advertise-url: 'http://${HOSTNAME}.vm.${FLY_APP_NAME}.internal:20202'
+  advertise-url: 'http://${HOSTNAME}.vm.${FLY_APP_NAME}.internal:20202'  # Ensure this URL is correct
 
   consul:
-    url: '${FLY_CONSUL_URL}'
-    key: 'epic-stack-litefs/${FLY_APP_NAME}'
+    url: '${FLY_CONSUL_URL}'  # Ensure this URL is reachable
+    key: 'epic-stack-litefs/${FLY_APP_NAME}'  # Ensure this key is correct
 
 exec:
-  - cmd: echo "DEBUG: Running prisma migrate deploy" && npx prisma migrate deploy
+  - cmd: npx prisma migrate deploy
     if-candidate: true
 
-  - cmd: echo "DEBUG: Setting journal mode for database to WAL" && sqlite3 $DATABASE_PATH "PRAGMA journal_mode = WAL;"
+  - cmd: sqlite3 $DATABASE_PATH "PRAGMA journal_mode = WAL;"
     if-candidate: true
 
-  - cmd: echo "DEBUG: Setting journal mode for cache to WAL" && sqlite3 $CACHE_DATABASE_PATH "PRAGMA journal_mode = WAL;"
+  - cmd: sqlite3 $CACHE_DATABASE_PATH "PRAGMA journal_mode = WAL;"
     if-candidate: true
 
-  - cmd: echo "DEBUG: Starting application" && npm start
+  - cmd: npm start
