@@ -9,9 +9,9 @@ import {
 	Heading,
 } from '@react-email/components'
 import { Markdown } from '@react-email/markdown'
+import Github from '#app/images/github.tsx'
 import { type ProcessedPrData, type TeamMember } from '#app/utils/types.tsx'
 
-import Github from '#app/images/github.tsx'
 
 interface TeamSummaryProps {
 	teamMembers: TeamMember[]

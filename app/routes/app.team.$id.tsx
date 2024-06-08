@@ -4,8 +4,8 @@ import {
 	json,
 } from '@remix-run/node'
 
-import { getSession } from '#app/utils/session.server.ts'
 import { prisma } from '#app/utils/db.server.ts'
+import { getSession } from '#app/utils/session.server.ts'
 
 type ActionData = { status: 'error'; message: string } | { status: 'success' }
 

@@ -1,7 +1,7 @@
-import type { TeamMember } from '#app/utils/types'
-
-import { Icon } from '#app/components/ui/icon.tsx'
 import { useFetcher } from '@remix-run/react'
+import { Icon } from '#app/components/ui/icon.tsx'
+import  { type TeamMember } from '#app/utils/types'
+
 
 interface Props {
 	teamMember: TeamMember

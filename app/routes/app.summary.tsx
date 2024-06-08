@@ -5,13 +5,12 @@ import {
 	json,
 	redirect,
 } from '@remix-run/node'
-import { Loader2 } from 'lucide-react'
 
 import { Form, useNavigation, useSearchParams } from '@remix-run/react'
+import { Loader2 } from 'lucide-react'
 
-import { getSession } from '#app/utils/session.server.ts'
-import { Input } from '#app/@/components/ui/input.tsx'
 import { Button } from '#app/@/components/ui/button.tsx'
+import { Input } from '#app/@/components/ui/input.tsx'
 import {
 	Select,
 	SelectContent,
@@ -19,10 +18,11 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '#app/@/components/ui/select.tsx'
-import GithubContributionSummary from '#app/components/github-contribution-summary.tsx'
 import AppLayout from '#app/components/app-layout'
-import { prisma } from '#app/utils/db.server'
+import GithubContributionSummary from '#app/components/github-contribution-summary.tsx'
 import { GITHUB_LOGIN_URL } from '#app/utils/constants'
+import { prisma } from '#app/utils/db.server'
+import { getSession } from '#app/utils/session.server.ts'
 
 type ActionData =
 	| { status: 'error'; message: string }

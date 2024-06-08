@@ -1,9 +1,9 @@
-import { useLoaderData, Link } from '@remix-run/react'
-import { json, type LoaderFunctionArgs, redirect } from '@remix-run/node'
 import { Prisma } from '@prisma/client'
+import { json, type LoaderFunctionArgs, redirect } from '@remix-run/node'
+import { useLoaderData, Link } from '@remix-run/react'
 import Github from '#app/images/github.tsx'
-import { getSession } from '#app/utils/session.server.ts'
 import { getGithubToken } from '#app/orm/user.server'
+import { getSession } from '#app/utils/session.server.ts'
 
 // Existing loader function...
 

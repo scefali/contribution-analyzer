@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react'
 import Markdown from 'react-markdown'
 
 import { useBufferedEventSource } from '#app/utils/use-buffered-event-source.ts'
-import { type ProcessedPrData, type StreamData } from '#app/utils/types.tsx'
 import { Spinner } from './spinner'
+import { type ProcessedPrData, type StreamData } from '#app/utils/types.tsx'
 
 interface Props {
 	userName: string

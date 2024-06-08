@@ -1,11 +1,11 @@
+import { Prisma } from '@prisma/client'
 import { type DataFunctionArgs } from '@remix-run/node'
 
+import { getGithubToken } from '#app/orm/user.server'
+import { GITHUB_LOGIN_URL } from '#app/utils/constants'
+import { eventStream } from '#app/utils/event-stream.ts'
 import { generateSummary, getUser, TimePeriod } from '#app/utils/github.ts'
 import { getSession } from '#app/utils/session.server.ts'
-import { eventStream } from '#app/utils/event-stream.ts'
-import { getGithubToken } from '#app/orm/user.server'
-import { Prisma } from '@prisma/client'
-import { GITHUB_LOGIN_URL } from '#app/utils/constants'
 
 function streamResponse(
 	request: DataFunctionArgs['request'],

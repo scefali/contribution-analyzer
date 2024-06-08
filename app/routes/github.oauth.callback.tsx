@@ -1,8 +1,8 @@
 import { type DataFunctionArgs, redirect } from '@remix-run/node'
+import { GITHUB_LOGIN_URL } from '#app/utils/constants'
+import { prisma } from '#app/utils/db.server.ts'
 import { getMyUser } from '#app/utils/github.ts'
 import { commitSession, getSession } from '#app/utils/session.server.ts'
-import { prisma } from '#app/utils/db.server.ts'
-import { GITHUB_LOGIN_URL } from '#app/utils/constants'
 
 export async function loader({ request }: DataFunctionArgs) {
 	const url = new URL(request.url)

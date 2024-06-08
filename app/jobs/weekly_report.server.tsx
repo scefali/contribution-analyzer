@@ -1,8 +1,7 @@
+import { PrismaClient ,type  User } from '@prisma/client'
 import { cronTrigger } from '@trigger.dev/sdk'
-import { PrismaClient } from '@prisma/client'
-import { sendEmail } from '#app/utils/email.server.ts'
-import type { User } from '@prisma/client'
 import { client } from '#app/trigger.server'
+import { sendEmail } from '#app/utils/email.server.ts'
 import { generateTeamSummaryForUser } from '#app/utils/reports'
 
 const prisma = new PrismaClient()
