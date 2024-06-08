@@ -20,9 +20,8 @@ lease:
     key: 'epic-stack-litefs/${FLY_APP_NAME}'  # Ensure this key is correct
 
 exec:
-  - cmd: npx prisma migrate deploy
+  - cmd: echo "Debug: Starting prisma migrate deploy" && npx prisma migrate deploy
     if-candidate: true
-
   - cmd: sqlite3 $DATABASE_PATH "PRAGMA journal_mode = WAL;"
     if-candidate: true
 
