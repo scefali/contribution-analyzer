@@ -26,9 +26,7 @@ export async function loader({ request }: DataFunctionArgs) {
 			code: code,
 		}),
 	}).then(res => res.json());
-	console.log(tokenResponse);
 	const { access_token: token, refresh_token: refreshToken, expires_in: expiresIn } = tokenResponse
-	console.log(token)
 	const data: any = await getMyUser({ githubCookie: token })
 	const gitHubUserId = data.id
 
