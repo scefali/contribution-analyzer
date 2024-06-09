@@ -79,6 +79,9 @@ COPY --from=flyio/litefs:0.5.11 /usr/local/bin/litefs /usr/local/bin/litefs
 ADD other/litefs.yml /etc/litefs.yml
 RUN mkdir -p /data ${LITEFS_DIR}
 
+# this will cause split brain with multiple machines but I don't know how to fix it
+RUN npx prisma migrate dev
+
 ADD . .
 
 CMD ["litefs", "mount"]
