@@ -118,7 +118,6 @@ export const getMyUser = async ({ githubCookie }: { githubCookie: string }) => {
 		},
 	})
 	const out = await response.json()
-	console.log(out)
 	return out
 }
 
