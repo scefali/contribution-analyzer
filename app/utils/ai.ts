@@ -8,6 +8,7 @@ function getRepoFromPr(pr: PullRequest) {
 	return `${pr.repository_url.split('/').slice(-2).join('/')}`
 }
 
+
 function getMetadataAction(pr: ReturnType<typeof getPrContentData>) {
 	return {
 		action: 'metadata',
