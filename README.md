@@ -1,54 +1,26 @@
-<div align="center">
-  <h1 align="center"><a href="https://www.epicweb.dev/epic-stack">The Epic Stack 🚀</a></h1>
-  <strong align="center">
-    Ditch analysis paralysis and start shipping Epic Web apps.
-  </strong>
-  <p>
-    This is an opinionated project starter and reference that allows teams to
-    ship their ideas to production faster and on a more stable foundation based
-    on the experience of <a href="https://kentcdodds.com">Kent C. Dodds</a> and
-    <a href="https://github.com/epicweb-dev/epic-stack/graphs/contributors">contributors</a>.
-  </p>
-</div>
+# Contribution Analyzer
+This app is designed for managers to monitor the GitHub contributions of their team. It has the following features:
 
-```sh
-npx create-epic-app@latest
-```
+* Generate summaries of activities for a given GitHub user based on their merged pull requests.
+* Add members to your team in a UI and generate weekly reports of their GitHub activities.
 
-[![The Epic Stack](https://github-production-user-asset-6210df.s3.amazonaws.com/1500684/246885449-1b00286c-aa3d-44b2-9ef2-04f694eb3592.png)](https://www.epicweb.dev/epic-stack)
+## Environment Variables
 
-[The Epic Stack](https://www.epicweb.dev/epic-stack)
+To run this project, you will need to add the following environment variables to your .env file:
 
-<hr />
+`SENTRY_DSN`
+This is your Sentry Data Source Name, which is used for error tracking and monitoring. You can get this from your Sentry account.
 
-## Watch Kent's Introduction to The Epic Stack
+`GITHUB_CLIENT_SECRET`
+This is your GitHub client secret, which is used for GitHub OAuth. You can get this by creating a new OAuth app in your GitHub account.
 
-[![Epic Stack Talk slide showing Flynn Rider with knives, the text "I've been around and I've got opinions" and Kent speaking in the corner](https://github-production-user-asset-6210df.s3.amazonaws.com/1500684/277818553-47158e68-4efc-43ae-a477-9d1670d4217d.png)](https://www.epicweb.dev/talks/the-epic-stack)
+`GITHUB_CLIENT_ID`
+This is your GitHub client ID, which is used for GitHub OAuth. You can get this by creating a new OAuth app in your GitHub account.
 
-["The Epic Stack" by Kent C. Dodds](https://www.epicweb.dev/talks/the-epic-stack)
+`ALLOW_INDEXING`
+This is a boolean value (true/false) that determines whether search engines are allowed to index the site. Set this to `true` to allow indexing, `false` to disallow.
 
-## Docs
+`REDIS_CONNECTION_STRING`
+This is your Redis connection string, which is used for caching. You can get this from your Redis hosting provider.
 
-[Read the docs](https://github.com/epicweb-dev/epic-stack/blob/main/docs)
-(please 🙏).
-
-## Support
-
-- 🆘 Join the
-  [discussion on GitHub](https://github.com/epicweb-dev/epic-stack/discussions)
-  and the [KCD Community on Discord](https://kcd.im/discord).
-- 💡 Create an
-  [idea discussion](https://github.com/epicweb-dev/epic-stack/discussions/new?category=ideas)
-  for suggestions.
-- 🐛 Open a [GitHub issue](https://github.com/epicweb-dev/epic-stack/issues) to
-  report a bug.
-
-## Branding
-
-Want to talk about the Epic Stack in a blog post or talk? Great! Here are some
-assets you can use in your material:
-[EpicWeb.dev/brand](https://epicweb.dev/brand)
-
-## Thanks
-
-You rock 🪨
+Please replace these with your actual values.
