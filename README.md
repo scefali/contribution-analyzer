@@ -1,7 +1,7 @@
 # Contribution Analyzer
 This app is designed for managers to monitor the GitHub contributions of their team. It has the following features:
 
-* Generate summaries of activities for a given GitHub user based on their merged pull requests.
+* Generate summaries of activities for a given GitHub user based on their merged pull requests using AI (OpenAI).
 * Add members to your team in a UI and generate weekly reports of their GitHub activities.
 
 ## Environment Variables
